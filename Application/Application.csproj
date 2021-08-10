@@ -13,11 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Infrastructure.Core.csproj" />
+    <ProjectReference Include="..\Infrastructure.Read\Infrastructure.Read.csproj" />
     <ProjectReference Include="..\Infrastructure.Write\Infrastructure.Write.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Post\Queries\" />
   </ItemGroup>
 
 </Project>

@@ -2,25 +2,20 @@
 using System.Data.SqlClient;
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 
 namespace Test.Infrastructure.Common.Database
 {
     public class DropCreateDatabase : IDisposable
     {
-        //private const string DatabaseName = "Fabio_Test";
+        private const string DatabaseName = "MyBlog";
 
-        //private const string ConnectionString = @"Server=tcp:localhost,1433;Persist Security Info=False;User ID=sa;Password=Fabio1234;MultipleActiveResultSets=False;Connection Timeout=30;";
-        //private static readonly string _connectionStringWithDatabase = $"Server=tcp:localhost,1433;Initial Catalog={DatabaseName};Persist Security Info=False;User ID=sa;Password=Fabio1234;MultipleActiveResultSets=False;Connection Timeout=30;";
+        private const string ConnectionString = @"mongodb://localhost:27017";
 
         public DropCreateDatabase()
         {
-            //using (var connection = new SqlConnection(ConnectionString))
-            //{
-            //    connection.Open();
-
-            //    new SqlCommand($"DROP DATABASE IF EXISTS {DatabaseName}", connection).ExecuteNonQuery();
-            //    new SqlCommand($"CREATE DATABASE {DatabaseName}", connection).ExecuteNonQuery();
-            //}
+            MongoClient dbClient = new MongoClient(ConnectionString);
+            dbClient.DropDatabase(DatabaseName);
 
             //RunMigrations();
         }

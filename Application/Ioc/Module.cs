@@ -1,4 +1,5 @@
 ﻿using Application.Post.Commands;
+using Application.Post.Queries;
 using Autofac;
 using AutofacSerilogIntegration;
 using MediatR;
@@ -10,7 +11,7 @@ namespace Application.Ioc
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterModule(new Infrastructure.Write.Ioc.Module());
-            //builder.RegisterModule(new Infrastructure.Read.Ioc.Module());
+            builder.RegisterModule(new Infrastructure.Read.Ioc.Module());
 
             builder.RegisterLogger();
 
@@ -19,6 +20,10 @@ namespace Application.Ioc
             builder.RegisterType<PostWriteService>()
                    .AsSelf()
                    .InstancePerLifetimeScope();
+
+            builder.RegisterType<PostReadService>()
+                  .AsSelf()
+                  .InstancePerLifetimeScope();
         }
 
         private void RegisterMediatr(ContainerBuilder builder)

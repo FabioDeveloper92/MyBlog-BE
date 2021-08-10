@@ -13,38 +13,36 @@ namespace Test.Infrastructure.Common.Scenario
             _mediator = mediator;
         }
 
-        //public Scenario WithTask()
-        //{
-        //    var createTask = new CreateTaskBuilder()
-        //        .WithId(Guid.NewGuid())
-        //        .WithName("Default Name")
-        //        .WithDescription("Default Description")
-        //        .WithUserId(Guid.NewGuid())
-        //        .Build();
+        public Scenario WithPost()
+        {
+            var createTask = new CreatePostBuilder()
+                .WithId(Guid.NewGuid())
+                .WithTitle("Default Name")
+                .WithText("Default Description")
+                .Build();
 
-        //    _mediator.Send(createTask).Wait();
+            _mediator.Send(createTask).Wait();
 
-        //    return this;
-        //}
+            return this;
+        }
 
-        //public Scenario WithTask(Guid id, string name, string description, Guid userId)
-        //{
-        //    var createTask = new CreateTaskBuilder()
-        //        .WithId(id)
-        //        .WithName(name)
-        //        .WithDescription(description)
-        //        .WithUserId(userId)
-        //        .Build();
+        public Scenario WithPost(Guid id, string title, string text)
+        {
+            var createTask = new CreatePostBuilder()
+               .WithId(id)
+               .WithTitle(title)
+               .WithText(text)
+               .Build();
 
-        //    _mediator.Send(createTask).Wait();
+            _mediator.Send(createTask).Wait();
 
-        //    return this;
-        //}
+            return this;
+        }
 
-        //public Scenario And()
-        //{
-        //    return this;
-        //}
+        public Scenario And()
+        {
+            return this;
+        }
     
     }
 }

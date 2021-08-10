@@ -12,4 +12,10 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Read\Infrastructure.Read.csproj" />
+    <ProjectReference Include="..\Test.Common\Test.Common.csproj" />
+    <ProjectReference Include="..\Test.Infrastructure.Common\Test.Infrastructure.Common.csproj" />
+  </ItemGroup>
+
 </Project>

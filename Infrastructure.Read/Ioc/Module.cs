@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Infrastructure.Read.Post;
 
 namespace Infrastructure.Read.Ioc
 {
@@ -8,9 +9,9 @@ namespace Infrastructure.Read.Ioc
         {
             builder.RegisterModule(new Core.Ioc.Module());
 
-            //builder.RegisterType<TaskReadRepository>()
-            //       .As<ITaskReadRepository>()
-            //       .SingleInstance();
+            builder.RegisterType<PostReadRepository>()
+                   .As<IPostReadRepository>()
+                   .SingleInstance();
         }
     }
 }
