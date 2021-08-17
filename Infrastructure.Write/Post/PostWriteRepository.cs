@@ -24,7 +24,7 @@ namespace Infrastructure.Write.Post
 
         public async Task Add(Domain.Post postWriteDto, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var postDto = _postWriteMapper.ToTaskDto(postWriteDto);
+            var postDto = _postWriteMapper.ToPostDto(postWriteDto);
 
             cancellationToken.ThrowIfCancellationRequested();
             await _dbContext.InsertOneAsync(postDto);

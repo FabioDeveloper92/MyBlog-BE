@@ -47,6 +47,70 @@ namespace Application.Test.TaskTest.Commands
             var createTask = new CreatePostBuilder()
                 .WithTitle("")
                 .WithText("the name is void")
+                .WithCategory(0)
+                .WithCreateBy("Fabio")
+                .WithImageUrl("imageUrl")
+                .WithCreateDate(DateTime.Now)
+                .Build();
+
+            //ACT 
+            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+
+            //ASSERT
+            fn.Should().Throw<EmptyFieldException>();
+        }
+
+        [Fact]
+        public void create_post_with_text_is_void_should_exception()
+        {
+            //ARRANGE
+            var createTask = new CreatePostBuilder()
+                .WithTitle("title test")
+                .WithText("")
+                .WithCategory(0)
+                .WithCreateBy("Fabio")
+                .WithImageUrl("imageUrl")
+                .WithCreateDate(DateTime.Now)
+                .Build();
+
+            //ACT 
+            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+
+            //ASSERT
+            fn.Should().Throw<EmptyFieldException>();
+        }
+
+        [Fact]
+        public void create_post_with_createby_is_void_should_exception()
+        {
+            //ARRANGE
+            var createTask = new CreatePostBuilder()
+                .WithTitle("title test")
+                .WithText("abcdef ghiflmno")
+                .WithCategory(0)
+                .WithCreateBy("")
+                .WithImageUrl("imageUrl")
+                .WithCreateDate(DateTime.Now)
+                .Build();
+
+            //ACT 
+            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+
+            //ASSERT
+            fn.Should().Throw<EmptyFieldException>();
+        }
+
+        [Fact]
+        public void create_post_with_imageurl_is_void_should_exception()
+        {
+            //ARRANGE
+            var createTask = new CreatePostBuilder()
+                .WithTitle("title test")
+                .WithText("this a test")
+                .WithCategory(0)
+                .WithCreateBy("Fabio")
+                .WithImageUrl("")
+                .WithCreateDate(DateTime.Now)
                 .Build();
 
             //ACT 

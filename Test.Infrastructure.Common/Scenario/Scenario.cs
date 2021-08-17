@@ -19,6 +19,10 @@ namespace Test.Infrastructure.Common.Scenario
                 .WithId(Guid.NewGuid())
                 .WithTitle("Default Name")
                 .WithText("Default Description")
+                .WithCategory(0)
+                .WithImageUrl("urlfake")
+                .WithCreateDate(DateTime.Now)
+                .WithCreateBy("Fabio")
                 .Build();
 
             _mediator.Send(createTask).Wait();
@@ -26,12 +30,16 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
-        public Scenario WithPost(Guid id, string title, string text)
+        public Scenario WithPost(Guid id, string title, string text, int category, string imageUrl, DateTime createDate, string createBy)
         {
             var createTask = new CreatePostBuilder()
                .WithId(id)
                .WithTitle(title)
                .WithText(text)
+               .WithCategory(category)
+               .WithImageUrl(imageUrl)
+               .WithCreateDate(createDate)
+               .WithCreateBy(createBy)
                .Build();
 
             _mediator.Send(createTask).Wait();
@@ -43,6 +51,6 @@ namespace Test.Infrastructure.Common.Scenario
         {
             return this;
         }
-    
+
     }
 }
