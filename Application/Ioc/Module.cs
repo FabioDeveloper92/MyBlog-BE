@@ -1,6 +1,7 @@
 ﻿using Application.Post.Commands;
 using Application.Post.Queries;
 using Application.User.Commands;
+using Application.User.Queries;
 using Autofac;
 using AutofacSerilogIntegration;
 using MediatR;
@@ -27,6 +28,10 @@ namespace Application.Ioc
                   .InstancePerLifetimeScope();
 
             builder.RegisterType<UserWriteService>()
+                 .AsSelf()
+                 .InstancePerLifetimeScope();
+
+            builder.RegisterType<UserReadService>()
                  .AsSelf()
                  .InstancePerLifetimeScope();
         }

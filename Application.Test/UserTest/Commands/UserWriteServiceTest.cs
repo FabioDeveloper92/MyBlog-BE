@@ -7,7 +7,7 @@ using Test.Common.Builders;
 using Test.Common.Builders.Commands;
 using Test.Infrastructure.Common;
 using Xunit;
-using Tasks = System.Threading.Tasks;
+using System.Threading.Tasks;
 using FluentAssertions;
 
 namespace Application.Test.UserTest.Commands
@@ -30,7 +30,7 @@ namespace Application.Test.UserTest.Commands
         }
 
         [Fact]
-        public async Tasks.Task create_user_should_create_a_new_user()
+        public async Task create_user_should_create_a_new_user()
         {
             //ARRANGE
             var createUser = new CreateUserBuilder().WithDefaults().Build();
@@ -40,7 +40,7 @@ namespace Application.Test.UserTest.Commands
         }
 
         [Fact]
-        public async Tasks.Task create_user_should_update_a_new_user()
+        public async Task create_user_should_update_a_new_user()
         {
             //ARRANGE
             var email = "fabio@test.it";
@@ -62,7 +62,7 @@ namespace Application.Test.UserTest.Commands
             _sandbox.Scenario.WithUser(Guid.NewGuid(), "Fabio", "Test", email, "123456", Domain.LoginProvider.Google, "123456", DateTime.Now.AddDays(5));
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(updateUser); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(updateUser); };
 
             //ASSERT
             fn.Should().Throw<LoginWithWrongProviderException>();
@@ -75,7 +75,7 @@ namespace Application.Test.UserTest.Commands
             var createUser = new CreateUserBuilder().WithDefaults().WithInternalToken("").Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -88,7 +88,7 @@ namespace Application.Test.UserTest.Commands
             var createUser = new CreateUserBuilder().WithDefaults().WithExpiredDate(DateTime.Now.AddDays(-1)).Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
 
             //ASSERT
             fn.Should().Throw<InvalidDateException>();
@@ -107,7 +107,7 @@ namespace Application.Test.UserTest.Commands
                 .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -126,7 +126,7 @@ namespace Application.Test.UserTest.Commands
                 .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -145,7 +145,7 @@ namespace Application.Test.UserTest.Commands
                .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -164,7 +164,7 @@ namespace Application.Test.UserTest.Commands
                .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();

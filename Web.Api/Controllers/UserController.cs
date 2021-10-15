@@ -1,4 +1,6 @@
 ﻿using Application.User.Commands;
+using Application.User.Queries;
+using Infrastructure.Read.User;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,12 @@ namespace Web.Api.Controllers
             await _mediator.Send(new CreateOrUpdateUser(item.Name, item.Surname, item.Email, item.ExternalToken, item.LoginWith, internalToken, expiredDate));
 
             return internalToken;
+        }
+
+        [HttpGet("{token}")]
+        public async Task<UserReadDto> Get(string token)
+        {
+            return await _mediator.Send(new GetUser(token));
         }
     }
 }

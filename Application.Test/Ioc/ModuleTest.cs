@@ -2,6 +2,7 @@
 using Application.Post.Commands;
 using Application.Post.Queries;
 using Application.User.Commands;
+using Application.User.Queries;
 using Config.Ioc;
 using Test.Common;
 using Test.Common.Builders;
@@ -38,6 +39,12 @@ namespace Application.Test.Ioc
         public void should_resolve_UserWriteService()
         {
             _scopeResolver.IsInstancePerLifetimeScope<UserWriteService>();
+        }
+
+        [Fact]
+        public void should_resolve_UserReadService()
+        {
+            _scopeResolver.IsInstancePerLifetimeScope<UserReadService>();
         }
 
         public void Dispose()

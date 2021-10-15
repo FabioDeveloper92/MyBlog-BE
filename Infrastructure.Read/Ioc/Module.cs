@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Infrastructure.Read.Post;
+using Infrastructure.Read.User;
 
 namespace Infrastructure.Read.Ioc
 {
@@ -11,6 +12,10 @@ namespace Infrastructure.Read.Ioc
 
             builder.RegisterType<PostReadRepository>()
                    .As<IPostReadRepository>()
+                   .SingleInstance();
+
+            builder.RegisterType<UserReadRepository>()
+                   .As<IUserReadRepository>()
                    .SingleInstance();
         }
     }

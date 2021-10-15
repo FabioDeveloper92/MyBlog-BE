@@ -7,7 +7,7 @@ using Test.Common.Builders;
 using Test.Common.Builders.Commands;
 using Test.Infrastructure.Common;
 using Xunit;
-using Tasks = System.Threading.Tasks;
+using System.Threading.Tasks;
 using FluentAssertions;
 
 namespace Application.Test.TaskTest.Commands
@@ -31,7 +31,7 @@ namespace Application.Test.TaskTest.Commands
         }
 
         [Fact]
-        public async Tasks.Task create_post_should_create_a_new_post()
+        public async Task create_post_should_create_a_new_post()
         {
             //ARRANGE
             var createTask = new CreatePostBuilder().WithDefaults().Build();
@@ -54,7 +54,7 @@ namespace Application.Test.TaskTest.Commands
                 .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -74,7 +74,7 @@ namespace Application.Test.TaskTest.Commands
                 .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -94,7 +94,7 @@ namespace Application.Test.TaskTest.Commands
                 .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -114,7 +114,7 @@ namespace Application.Test.TaskTest.Commands
                 .Build();
 
             //ACT 
-            Func<Tasks.Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
