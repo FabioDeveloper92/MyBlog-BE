@@ -1,6 +1,7 @@
 ﻿using System;
 using Config.Ioc;
 using Infrastructure.Write.Post;
+using Infrastructure.Write.User;
 using Test.Common;
 using Test.Common.Builders;
 using Xunit;
@@ -34,6 +35,17 @@ namespace Infrastructure.Write.Test.Ioc
             _scopeResolver.IsSingleInstance<IPostWriteMapper, PostWriteMapper>();
         }
 
+        [Fact]
+        public void should_resolve_IUserWriteRepository()
+        {
+            _scopeResolver.IsSingleInstance<IUserWriteRepository, UserWriteRepository>();
+        }
+
+        [Fact]
+        public void should_resolve_IUserWriteMapper()
+        {
+            _scopeResolver.IsSingleInstance<IUserWriteMapper, UserWriteMapper>();
+        }
 
         public void Dispose()
         {

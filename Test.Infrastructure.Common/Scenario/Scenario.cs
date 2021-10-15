@@ -47,6 +47,41 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
+        public Scenario WithUser()
+        {
+            var createUser = new CreateUserBuilder()
+                .WithId(Guid.NewGuid())
+                .WithName("Name")
+                .WithSurname("Surname")
+                .WithEmail("default@test.it")
+                .WithExternalToken("externalToken")
+                .WithLoginWith(Domain.LoginProvider.Google)
+                .WithInternalToken(Guid.NewGuid().ToString())
+                .WithExpiredDate(DateTime.Now.AddDays(5))
+                .Build();
+
+            _mediator.Send(createUser).Wait();
+
+            return this;
+        }
+
+        public Scenario WithUser(Guid id, string name, string surname, string email, string externalToken, Domain.LoginProvider loginWith, string internalToken, DateTime? expiredDate)
+        {
+            var createUser = new CreateUserBuilder()
+                .WithId(id)
+                .WithName(name)
+                .WithSurname(surname)
+                .WithEmail(email)
+                .WithExternalToken(externalToken)
+                .WithLoginWith(loginWith)
+                .WithInternalToken(internalToken)
+                .WithExpiredDate(expiredDate)
+                .Build();
+
+            _mediator.Send(createUser).Wait();
+
+            return this;
+        }
         public Scenario And()
         {
             return this;

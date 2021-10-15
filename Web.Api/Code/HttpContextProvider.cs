@@ -8,10 +8,19 @@ namespace Web.Api.Code
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Admins _admins;
-
+        public HttpContextProvider(IHttpContextAccessor httpContextAccessor, Admins admins)
+        {
+            _httpContextAccessor = httpContextAccessor;
+            _admins = admins;
+        }
         public string BuildUrl(string relativeUrl = null)
         {
-            throw new System.NotImplementedException();
+            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            var host = _httpContextAccessor.HttpContext.Request.Host.Value;
+
+            var prefix = $"{scheme}://{host}";
+
+            return !string.IsNullOrEmpty(relativeUrl) ? $"{prefix}/{relativeUrl}" : prefix;
         }
 
         public string TryGetEmail()

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System;
 using Autofac;
 using Microsoft.Extensions.Configuration;
 
@@ -23,8 +23,23 @@ namespace Config.Ioc
                .SingleInstance();
 
             builder.Register(c =>
+                 new Cors
+                 {
+                     Enabled = Convert.ToBoolean(_configuration.GetSection("Cors:Enabled").Value)
+                 })
+             .SingleInstance();
+
+            builder.Register(c =>
                 (MongoDBConnectionString)
                 _configuration.GetConnectionString("MongoDBConnectionString")).SingleInstance();
+
+            builder.Register(c =>
+                new GoogleAuth()
+                {
+                    ClientId = _configuration.GetSection("Google:ClientId").Value,
+                    ClientSecretId = _configuration.GetSection("Google:ClientSecretId").Value,
+                })
+             .SingleInstance();
 
         }
     }

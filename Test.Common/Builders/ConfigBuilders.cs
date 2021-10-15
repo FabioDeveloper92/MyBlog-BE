@@ -14,7 +14,10 @@ namespace Test.Common.Builders
             var defaultConfig = new Dictionary<string, string>
             {
                 {"Database:Name", "MyBlog"},
-                {"ConnectionStrings:MongoDBConnectionString","mongodb://localhost:27017"}
+                {"ConnectionStrings:MongoDBConnectionString","mongodb://localhost:27017"},
+                { "Cors:Enabled", "true" },
+                {"Google:ClientId","client"},
+                {"Google:ClientSecretId","clientId"}
             };
 
             Add(defaultConfig);

@@ -34,6 +34,21 @@ namespace Config.Test.Ioc
             _scopeResolver.Resolve<MongoDBConnectionString>().Value.Should().Be("mongodb://localhost:27017");
         }
 
+        [Fact]
+        public void should_resolve_Cors()
+        {
+            _scopeResolver.IsSingleInstance<Cors>();
+            _scopeResolver.Resolve<Cors>().Enabled.Should().BeTrue();
+        }
+
+        [Fact]
+        public void should_resolve_GooogleAuth()
+        {
+            _scopeResolver.IsSingleInstance<GoogleAuth>();
+            _scopeResolver.Resolve<GoogleAuth>().ClientId.Should().Be("client");
+            _scopeResolver.Resolve<GoogleAuth>().ClientSecretId.Should().Be("clientId");
+        }
+
         public void Dispose()
         {
             _scopeResolver.Dispose();

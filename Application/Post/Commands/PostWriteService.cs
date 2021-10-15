@@ -1,5 +1,4 @@
-﻿using Infrastructure.Core;
-using Infrastructure.Write.Post;
+﻿using Infrastructure.Write.Post;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;

@@ -1,7 +1,7 @@
-﻿using Autofac;
-using Application.Code;
-using Web.Api.Code;
+﻿using Application.Code;
+using Autofac;
 using Microsoft.Extensions.Configuration;
+using Web.Api.Code;
 
 namespace Web.Api.Ioc
 {

@@ -1,5 +1,6 @@
 ﻿using Application.Post.Commands;
 using Application.Post.Queries;
+using Application.User.Commands;
 using Autofac;
 using AutofacSerilogIntegration;
 using MediatR;
@@ -24,6 +25,10 @@ namespace Application.Ioc
             builder.RegisterType<PostReadService>()
                   .AsSelf()
                   .InstancePerLifetimeScope();
+
+            builder.RegisterType<UserWriteService>()
+                 .AsSelf()
+                 .InstancePerLifetimeScope();
         }
 
         private void RegisterMediatr(ContainerBuilder builder)

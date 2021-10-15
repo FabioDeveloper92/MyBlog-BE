@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Infrastructure.Write.Post;
+using Infrastructure.Write.User;
 
 namespace Infrastructure.Write.Ioc
 {
@@ -12,9 +13,17 @@ namespace Infrastructure.Write.Ioc
             builder.RegisterType<PostWriteRepository>()
                    .As<IPostWriteRepository>()
                    .SingleInstance();
-            
+
             builder.RegisterType<PostWriteMapper>()
                    .As<IPostWriteMapper>()
+                   .SingleInstance();
+
+            builder.RegisterType<UserWriteRepository>()
+                   .As<IUserWriteRepository>()
+                   .SingleInstance();
+
+            builder.RegisterType<UserWriteMapper>()
+                   .As<IUserWriteMapper>()
                    .SingleInstance();
         }
     }

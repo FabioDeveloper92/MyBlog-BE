@@ -1,4 +1,8 @@
 ﻿using System;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace Web.Api
@@ -16,6 +20,7 @@ namespace Web.Api
             try
             {
                 Log.Information("Starting Api Host");
+                BuildWebHost(args).Run();
 
                 return 0;
             }
@@ -30,22 +35,22 @@ namespace Web.Api
             }
         }
 
-        //public static IWebHost BuildWebHost(string[] args)
-        //{
-        //    return WebHost.CreateDefaultBuilder(args)
-        //        .UseStartup<Startup>()
-        //        .ConfigureAppConfiguration((builderContext, config) =>
-        //        {
-        //            var env = builderContext.HostingEnvironment;
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .ConfigureAppConfiguration((builderContext, config) =>
+                {
+                    var env = builderContext.HostingEnvironment;
 
-        //            config
-        //                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        //                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-        //                .AddEnvironmentVariables();
-        //        })
-        //        .ConfigureServices(services => services.AddAutofac())
-        //        .UseSerilog()
-        //        .Build();
-        //}
+                    config
+                        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                        .AddEnvironmentVariables();
+                })
+                .ConfigureServices(services => services.AddAutofac())
+                .UseSerilog()
+                .Build();
+        }
     }
 }
