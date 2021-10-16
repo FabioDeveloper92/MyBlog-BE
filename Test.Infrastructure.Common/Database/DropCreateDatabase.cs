@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Data.SqlClient;
 using FluentMigrator.Runner;
+using Infrastructure.Write;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 

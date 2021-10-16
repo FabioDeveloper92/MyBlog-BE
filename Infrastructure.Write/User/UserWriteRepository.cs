@@ -32,21 +32,21 @@ namespace Infrastructure.Write.User
 
         public async Task Add(Domain.User User, CancellationToken cancellationToken = default)
         {
-            var UserDto = _UserWriteMapper.ToUserDto(User);
+            var userDto = _UserWriteMapper.ToUserDto(User);
             cancellationToken.ThrowIfCancellationRequested();
 
-            await _dbContext.InsertOneAsync(UserDto);
+            await _dbContext.InsertOneAsync(userDto);
         }
 
         public async Task Update(Domain.User User, CancellationToken cancellationToken = default)
         {
-            var UserDto = _UserWriteMapper.ToUserDto(User);
+            var userDto = _UserWriteMapper.ToUserDto(User);
             cancellationToken.ThrowIfCancellationRequested();
 
-            var filter = Builders<UserWriteDto>.Filter.Eq("email", UserDto.Email);
-            var update = Builders<UserWriteDto>.Update.Set("name", UserDto.Name)
-                                                          .Set("surname", UserDto.Surname)
-                                                          .Set("externalToken", UserDto.ExternalToken);
+            var filter = Builders<UserWriteDto>.Filter.Eq("Email", userDto.Email);
+            var update = Builders<UserWriteDto>.Update.Set("Name", userDto.Name)
+                                                      .Set("Surname", userDto.Surname)
+                                                      .Set("ExternalToken", userDto.ExternalToken);
 
             await _dbContext.UpdateOneAsync(filter, update);
         }

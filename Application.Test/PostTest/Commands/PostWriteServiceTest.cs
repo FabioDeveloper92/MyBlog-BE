@@ -9,8 +9,9 @@ using Test.Infrastructure.Common;
 using Xunit;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Infrastructure.Write;
 
-namespace Application.Test.TaskTest.Commands
+namespace Application.Test.PostTest.Commands
 {
     [Trait("Type", "Integration")]
     [Trait("Category", "Database")]
@@ -28,6 +29,9 @@ namespace Application.Test.TaskTest.Commands
 
             _sandbox = new Sandbox(configBuilder.BuildModule(), new Application.Ioc.Module(), new MockedDotnetCoreModuleTest(),
                 new MockModule(_contextProvider));
+
+            BsonClassMapHelper.Clear();
+            MongoDBInstallmentMap.Map();
         }
 
         [Fact]

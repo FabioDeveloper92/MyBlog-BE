@@ -3,6 +3,7 @@ using Application.User.Queries;
 using Autofac;
 using Domain.Exceptions;
 using FluentAssertions;
+using Infrastructure.Write;
 using NSubstitute;
 using System;
 using System.Threading.Tasks;
@@ -27,6 +28,9 @@ namespace Application.Test.UserTest.Queries
             _contextProvider = Substitute.For<IContextProvider>();
 
             _sandbox = new Sandbox(configBuilder.BuildModule(), new Application.Ioc.Module(), new MockedDotnetCoreModuleTest(), new MockModule(_contextProvider));
+
+            BsonClassMapHelper.Clear();
+            MongoDBInstallmentMap.Map();
         }
 
         [Fact]
@@ -36,7 +40,7 @@ namespace Application.Test.UserTest.Queries
             var name = "John";
             var surname = "Wick";
             var email = "john@wick.it";
-            var internalToken = "123456";
+            var internalToken = Guid.NewGuid().ToString();
             _sandbox.Scenario.WithUser(Guid.NewGuid(), name, surname, email, "pippo:12", Domain.LoginProvider.Google, internalToken, DateTime.Now.AddDays(5));
 
             //ACT
@@ -50,13 +54,29 @@ namespace Application.Test.UserTest.Queries
         }
 
         [Fact]
-        public void get_user_should_not_valid()
+        public void get_user_should_token_not_exist()
         {
             //ARRANGE
-            _sandbox.Scenario.WithUser(Guid.NewGuid(), "Fabio", "Test", "email@test.net", "123456", Domain.LoginProvider.Google, "123456", DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithUser(Guid.NewGuid(), "Fabio", "Test", "email@notexist.net", "123456", Domain.LoginProvider.Google, "123456", DateTime.Now.AddDays(5));
 
             //ACT 
             Func<Task> fn = async () => { await _sandbox.Mediator.Send(new GetUser("Fake")); };
+
+            //ASSERT
+            fn.Should().Throw<NotFoundItemException>();
+        }
+
+        [Fact]
+        public void get_user_should_token_is_expired()
+        {
+            //ARRANGE
+            var internalToken = Guid.NewGuid().ToString();
+            _sandbox.Scenario.WithUser(Guid.NewGuid(), "Fabio", "Test", "email@expiredtoken.net", "123456", Domain.LoginProvider.Google, internalToken, DateTime.UtcNow.AddSeconds(1));
+
+            System.Threading.Thread.Sleep(1000);
+
+            //ACT 
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new GetUser(internalToken)); };
 
             //ASSERT
             fn.Should().Throw<NotFoundItemException>();

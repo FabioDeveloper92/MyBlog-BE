@@ -9,6 +9,7 @@ using Test.Infrastructure.Common;
 using Xunit;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Infrastructure.Write;
 
 namespace Application.Test.UserTest.Commands
 {
@@ -27,6 +28,9 @@ namespace Application.Test.UserTest.Commands
 
             _sandbox = new Sandbox(configBuilder.BuildModule(), new Application.Ioc.Module(), new MockedDotnetCoreModuleTest(),
                 new MockModule(_contextProvider));
+
+            BsonClassMapHelper.Clear();
+            MongoDBInstallmentMap.Map();
         }
 
         [Fact]

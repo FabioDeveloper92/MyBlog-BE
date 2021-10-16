@@ -5,12 +5,13 @@ using Application.Code;
 using Application.Post.Queries;
 using Autofac;
 using FluentAssertions;
+using Infrastructure.Write;
 using NSubstitute;
 using Test.Common.Builders;
 using Test.Infrastructure.Common;
 using Xunit;
 
-namespace Application.Test.TaskTest.Queries
+namespace Application.Test.PostTest.Queries
 {
     [Trait("Type", "Integration")]
     [Trait("Category", "Database")]
@@ -27,6 +28,9 @@ namespace Application.Test.TaskTest.Queries
             _contextProvider = Substitute.For<IContextProvider>();
 
             _sandbox = new Sandbox(configBuilder.BuildModule(), new Application.Ioc.Module(), new MockedDotnetCoreModuleTest(), new MockModule(_contextProvider));
+
+            BsonClassMapHelper.Clear();
+            MongoDBInstallmentMap.Map();
         }
 
         [Fact]

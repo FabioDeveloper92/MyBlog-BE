@@ -96,7 +96,7 @@ namespace Domain
             if (!ValidateLoginProvider(LoginWith))
                 throw new LoginProviderNotExistException(LoginWith.ToString());
 
-            if (ExpiredDate.HasValue && ExpiredDate.Value < DateTime.Now)
+            if (ExpiredDate.HasValue && ExpiredDate.Value < DateTime.UtcNow)
                 throw new InvalidDateException(nameof(ExpiredDate), ExpiredDate.Value.ToString("dd MM yyyy"));
             else if (ExpiredDate.HasValue && string.IsNullOrEmpty(InternalToken))
                 throw new EmptyFieldException(nameof(InternalToken));

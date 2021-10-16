@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Serilog;
 using Web.Api.Filters;
 using Config;
+using Infrastructure.Write;
 
 namespace Web.Api
 {
@@ -49,6 +50,8 @@ namespace Web.Api
             services.AddMemoryCache();
             services.AddScoped<ApiExceptionFilter>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            MongoDBInstallmentMap.Map();
 
             services.AddAuthentication()
                 .AddGoogle(options =>

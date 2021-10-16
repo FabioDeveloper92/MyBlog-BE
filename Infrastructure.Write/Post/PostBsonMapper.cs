@@ -1,5 +1,7 @@
 ﻿using Infrastructure.Core;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using System;
 
 namespace Infrastructure.Write.Post
 {
@@ -11,14 +13,14 @@ namespace Infrastructure.Write.Post
             {
                 map.AutoMap();
                 map.SetIgnoreExtraElements(true);
-                map.MapIdMember(x => x.Id);
+
                 map.MapMember(x => x.Title).SetIsRequired(true);
                 map.MapMember(x => x.Text).SetIsRequired(true);
                 map.MapMember(x => x.Category).SetIsRequired(true);
                 map.MapMember(x => x.CreateBy).SetIsRequired(true);
                 map.MapMember(x => x.ImageUrl).SetIsRequired(true);
 
-                map.MapMember(x => x.CreateDate).SetIsRequired(true);
+                map.MapMember(x => x.CreateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Local)); ;
             });
         }
     }
