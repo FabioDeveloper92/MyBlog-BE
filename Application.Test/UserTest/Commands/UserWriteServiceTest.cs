@@ -10,6 +10,7 @@ using Xunit;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Infrastructure.Write;
+using Application.User.Commands;
 
 namespace Application.Test.UserTest.Commands
 {
@@ -140,11 +141,25 @@ namespace Application.Test.UserTest.Commands
         public void create_post_with_email_is_void_should_exception()
         {
             //ARRANGE
+            var internalToken = Guid.NewGuid().ToString();
+            _sandbox.Scenario.WithUser(Guid.NewGuid(), "Fabio", "Test", "email@notexist.net", "123456", Domain.LoginProvider.Google, internalToken, DateTime.Now.AddDays(5));
+
+            //ACT 
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new LogoutUser(internalToken)); };
+
+            //ASSERT
+            fn.Should().Throw<EmptyFieldException>();
+        }
+
+        [Fact]
+        public void create_post_with_external_token_is_void_should_exception()
+        {
+            //ARRANGE
             var createUser = new CreateUserBuilder()
                .WithName("name")
                .WithSurname("Surname")
-               .WithEmail("")
-               .WithExternalToken("externalToken")
+               .WithEmail("email@test.it")
+               .WithExternalToken("")
                .WithLoginWith(Domain.LoginProvider.Google)
                .Build();
 
@@ -156,7 +171,7 @@ namespace Application.Test.UserTest.Commands
         }
 
         [Fact]
-        public void create_post_with_external_token_is_void_should_exception()
+        public void logout_user_with_internaltoken()
         {
             //ARRANGE
             var createUser = new CreateUserBuilder()

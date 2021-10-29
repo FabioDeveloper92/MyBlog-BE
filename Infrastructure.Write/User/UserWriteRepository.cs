@@ -10,6 +10,7 @@ namespace Infrastructure.Write.User
         Task<UserWriteDto> SingleOrDefault(string email, CancellationToken cancellationToken = default(CancellationToken));
         Task Add(Domain.User User, CancellationToken cancellationToken = default(CancellationToken));
         Task Update(Domain.User User, CancellationToken cancellationToken = default(CancellationToken));
+        Task UpdateInternalToken(string token, CancellationToken cancellationToken = default(CancellationToken));
     }
     public class UserWriteRepository : IUserWriteRepository
     {
@@ -46,7 +47,18 @@ namespace Infrastructure.Write.User
             var filter = Builders<UserWriteDto>.Filter.Eq("Email", userDto.Email);
             var update = Builders<UserWriteDto>.Update.Set("Name", userDto.Name)
                                                       .Set("Surname", userDto.Surname)
+                                                      .Set("InternalToken", userDto.InternalToken)
                                                       .Set("ExternalToken", userDto.ExternalToken);
+
+            await _dbContext.UpdateOneAsync(filter, update);
+        }
+
+        public async Task UpdateInternalToken(string internalToken, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var filter = Builders<UserWriteDto>.Filter.Eq("InternalToken", internalToken);
+            var update = Builders<UserWriteDto>.Update.Set("InternalToken", string.Empty);
 
             await _dbContext.UpdateOneAsync(filter, update);
         }

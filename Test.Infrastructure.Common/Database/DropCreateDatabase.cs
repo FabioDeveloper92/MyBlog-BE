@@ -8,7 +8,7 @@ namespace Test.Infrastructure.Common.Database
 {
     public class DropCreateDatabase : IDisposable
     {
-        private const string DatabaseName = "MyBlog";
+        private const string DatabaseName = "MyBlog_TEST";
 
         private const string ConnectionString = @"mongodb://localhost:27017";
 

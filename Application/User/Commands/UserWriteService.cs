@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.User.Commands
 {
-    public class UserWriteService : IRequestHandler<CreateOrUpdateUser>
+    public class UserWriteService : IRequestHandler<CreateOrUpdateUser>, IRequestHandler<LogoutUser>
     {
         private readonly IUserWriteRepository _userWriteRepository;
 
@@ -32,6 +32,14 @@ namespace Application.User.Commands
             {
                 await _userWriteRepository.Add(entity);
             }
+
+            return Unit.Value;
+        }
+
+        public async Task<Unit> Handle(LogoutUser command, CancellationToken cancellationToken)
+        {
+            await _userWriteRepository.UpdateInternalToken(command.InternalToken);
+            
 
             return Unit.Value;
         }

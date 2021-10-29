@@ -82,6 +82,28 @@ namespace Application.Test.UserTest.Queries
             fn.Should().Throw<NotFoundItemException>();
         }
 
+        [Fact]
+        public async Task get_user_after_update_with_token_return_correct_user()
+        {
+            //ARRANGE
+            var name = "John";
+            var surname = "Wick";
+            var email = "john@wick.it";
+            var internalToken = Guid.NewGuid().ToString();
+            _sandbox.Scenario
+                     .WithUser(Guid.NewGuid(), name, surname, email, "pippo:12", Domain.LoginProvider.Google, Guid.NewGuid().ToString(), DateTime.Now.AddDays(5))
+                     .WithUser(Guid.NewGuid(), name, surname, email, "pippo:12", Domain.LoginProvider.Google, internalToken, DateTime.Now.AddDays(5));
+
+            //ACT
+            var user = await _sandbox.Mediator.Send(new GetUser(internalToken));
+
+            //ASSERT
+            user.Name.Should().Be(name);
+            user.Surname.Should().Be(surname);
+            user.Email.Should().Be(email);
+            user.InternalToken.Should().Be(internalToken);
+        }
+
         public void Dispose()
         {
             _sandbox?.Dispose();

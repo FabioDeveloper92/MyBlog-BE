@@ -40,5 +40,11 @@ namespace Web.Api.Controllers
         {
             return await _mediator.Send(new GetUser(token));
         }
+
+        [HttpDelete("{token}")]
+        public async Task Delete(string token)
+        {
+            await _mediator.Send(new LogoutUser(token));
+        }
     }
 }

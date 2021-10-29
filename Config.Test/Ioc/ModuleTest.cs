@@ -24,7 +24,7 @@ namespace Config.Test.Ioc
         public void should_resolve_Database()
         {
             _scopeResolver.IsSingleInstance<Database>();
-            _scopeResolver.Resolve<Database>().Name.Should().Be("MyBlog");
+            _scopeResolver.Resolve<Database>().Name.Should().Be("MyBlog_TEST");
         }
 
         [Fact]
