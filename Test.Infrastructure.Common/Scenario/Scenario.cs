@@ -49,13 +49,12 @@ namespace Test.Infrastructure.Common.Scenario
 
         public Scenario WithUser()
         {
-            var createUser = new CreateUserBuilder()
+            var createUser = new CreateGoogleUserBuilder()
                 .WithId(Guid.NewGuid())
                 .WithName("Name")
                 .WithSurname("Surname")
                 .WithEmail("default@test.it")
                 .WithExternalToken("externalToken")
-                .WithLoginWith(Domain.LoginProvider.Google)
                 .WithInternalToken(Guid.NewGuid().ToString())
                 .WithExpiredDate(DateTime.Now.AddDays(5))
                 .Build();
@@ -65,15 +64,31 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
-        public Scenario WithUser(Guid id, string name, string surname, string email, string externalToken, Domain.LoginProvider loginWith, string internalToken, DateTime? expiredDate)
+        public Scenario WithGoogleUser(Guid id, string name, string surname, string email, string externalToken, string internalToken, DateTime? expiredDate)
         {
-            var createUser = new CreateUserBuilder()
+            var createUser = new CreateGoogleUserBuilder()
                 .WithId(id)
                 .WithName(name)
                 .WithSurname(surname)
                 .WithEmail(email)
                 .WithExternalToken(externalToken)
-                .WithLoginWith(loginWith)
+                .WithInternalToken(internalToken)
+                .WithExpiredDate(expiredDate)
+                .Build();
+
+            _mediator.Send(createUser).Wait();
+
+            return this;
+        }
+
+        public Scenario WithJWTUser(Guid id, string name, string surname, string email, string password, string internalToken, DateTime? expiredDate)
+        {
+            var createUser = new CreateJwtUserBuilder()
+                .WithId(id)
+                .WithName(name)
+                .WithSurname(surname)
+                .WithEmail(email)
+                .WithPassword(password)
                 .WithInternalToken(internalToken)
                 .WithExpiredDate(expiredDate)
                 .Build();

@@ -4,81 +4,73 @@ using System;
 
 namespace Test.Common.Builders.Commands
 {
-    public class CreateUserBuilder
+    public class CreateJwtUserBuilder
     {
         private Guid _id;
         public string _name;
         public string _surname;
         public string _email;
-        public string _externalToken;
-        public LoginProvider _loginWith;
+        public string _password;
         public string _internalToken;
         public DateTime? _expiredDate;
 
-        public CreateUserBuilder WithDefaults()
+        public CreateJwtUserBuilder WithDefaults()
         {
             _id = Guid.NewGuid();
             _name = "Fabio";
             _surname = "Boh";
             _email = "fabio@test.it";
-            _externalToken = "123456789";
-            _loginWith = LoginProvider.Google;
+            _password = "Fake100*";
             _internalToken = Guid.NewGuid().ToString();
             _expiredDate = DateTime.Now.AddDays(5);
 
             return this;
         }
 
-        public CreateUserBuilder WithId(Guid loginWith)
+        public CreateJwtUserBuilder WithId(Guid loginWith)
         {
             _id = loginWith;
             return this;
         }
 
-        public CreateUserBuilder WithName(string name)
+        public CreateJwtUserBuilder WithName(string name)
         {
             _name = name;
             return this;
         }
 
-        public CreateUserBuilder WithSurname(string surname)
+        public CreateJwtUserBuilder WithSurname(string surname)
         {
             _surname = surname;
             return this;
         }
 
-        public CreateUserBuilder WithEmail(string email)
+        public CreateJwtUserBuilder WithEmail(string email)
         {
             _email = email;
             return this;
-        }
-
-        public CreateUserBuilder WithExternalToken(string externalToken)
+        }   
+        
+        public CreateJwtUserBuilder WithPassword(string password)
         {
-            _externalToken = externalToken;
+            _password = password;
             return this;
         }
-        public CreateUserBuilder WithLoginWith(LoginProvider loginWith)
-        {
-            _loginWith = loginWith;
-            return this;
-        }
-
-        public CreateUserBuilder WithInternalToken(string internalToken)
+        public CreateJwtUserBuilder WithInternalToken(string internalToken)
         {
             _internalToken = internalToken;
             return this;
         }
 
-        public CreateUserBuilder WithExpiredDate(DateTime? expiredDate)
+        public CreateJwtUserBuilder WithExpiredDate(DateTime? expiredDate)
         {
             _expiredDate = expiredDate;
             return this;
         }
 
-        public CreateOrUpdateUser Build()
+        public CreateUserFromJwt Build()
         {
-            return new CreateOrUpdateUser(_name, _surname, _email, _externalToken, (int)_loginWith, _internalToken, _expiredDate);
+            return new CreateUserFromJwt(_name, _surname, _email, _password, "", (int)LoginProvider.Jwt, _internalToken, _expiredDate);
         }
     }
 }

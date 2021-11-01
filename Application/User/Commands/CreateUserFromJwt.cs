@@ -1,9 +1,9 @@
-﻿using Infrastructure.Core;
+﻿using Application.Interfaces;
 using System;
 
-namespace Infrastructure.Write.User
+namespace Application.User.Commands
 {
-    public class UserWriteDto : Dto
+    public class CreateUserFromJwt : ICommand
     {
         public string Name { get; }
         public string Surname { get; }
@@ -12,9 +12,9 @@ namespace Infrastructure.Write.User
         public string ExternalToken { get; }
         public int LoginWith { get; }
         public string InternalToken { get; }
-        public DateTime? ExpiredToken { get; }
+        public DateTime? ExpiredDate { get; }
 
-        public UserWriteDto(Guid id, string name, string surname, string email, string password, string externalToken, int loginWith, string internalToken, DateTime? expiredToken) : base(id)
+        public CreateUserFromJwt(string name, string surname, string email, string password, string externalToken, int loginWith, string internalToken, DateTime? expiredDate)
         {
             Name = name;
             Surname = surname;
@@ -23,7 +23,7 @@ namespace Infrastructure.Write.User
             ExternalToken = externalToken;
             LoginWith = loginWith;
             InternalToken = internalToken;
-            ExpiredToken = expiredToken;
+            ExpiredDate = expiredDate;
         }
     }
 }

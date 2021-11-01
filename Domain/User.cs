@@ -1,13 +1,17 @@
 ﻿using Domain.Core;
 using Domain.Exceptions;
 using System;
+using System.Text.RegularExpressions;
 
 namespace Domain
 {
     public enum LoginProvider
     {
         Jwt = 0,
-        Google = 1
+        Google = 1,
+
+
+        Empty = 99
     }
 
     public class User : Entity<Guid>
@@ -15,28 +19,30 @@ namespace Domain
         public string Name { get; private set; }
         public string Surname { get; private set; }
         public string Email { get; private set; }
+        public string Password { get; private set; }
         public string ExternalToken { get; private set; }
         public int LoginWith { get; private set; }
         public string InternalToken { get; private set; }
-        public DateTime? ExpiredDate { get; private set; }
+        public DateTime? ExpiredToken { get; private set; }
 
-        private User(Guid id, string name, string surname, string email, string externalToken, int loginWith, string internalToken, DateTime? expiredDate) : base(id)
+        private User(Guid id, string name, string surname, string email, string password, string externalToken, int loginWith, string internalToken, DateTime? expiredToken) : base(id)
         {
             Name = name;
             Surname = surname;
             Email = email;
+            Password = password;
             ExternalToken = externalToken;
             LoginWith = loginWith;
             InternalToken = internalToken;
-            ExpiredDate = expiredDate;
+            ExpiredToken = expiredToken;
         }
 
-        public static User Create(string name, string surname, string email, string externalToken, int loginWith, string internalToken = null, DateTime? expiredDate = null, Guid? userId = null)
+        public static User Create(string name, string surname, string email, string password, string externalToken, int loginWith, string internalToken = null, DateTime? expiredToken = null, Guid? userId = null)
         {
             if (userId == null)
                 userId = Guid.NewGuid();
 
-            var item = new User(userId.Value, name, surname, email, externalToken, loginWith, internalToken, expiredDate);
+            var item = new User(userId.Value, name, surname, email, password, externalToken, loginWith, internalToken, expiredToken);
 
             item.Validate();
 
@@ -61,6 +67,12 @@ namespace Domain
             Validate();
         }
 
+        public void SetPassword(string password)
+        {
+            Password = password;
+            Validate();
+        }
+
         public void SetExternalToken(string internalToken)
         {
             ExternalToken = internalToken;
@@ -73,9 +85,9 @@ namespace Domain
             Validate();
         }
 
-        public void SetExpiredDate(DateTime expiredDate)
+        public void SetExpiredToken(DateTime? expiredToken)
         {
-            ExpiredDate = expiredDate;
+            ExpiredToken = expiredToken;
             Validate();
         }
 
@@ -90,29 +102,43 @@ namespace Domain
             if (string.IsNullOrEmpty(Email))
                 throw new EmptyFieldException(nameof(Email));
 
-            if (string.IsNullOrEmpty(ExternalToken))
-                throw new EmptyFieldException(nameof(ExternalToken));
+            ValidateCustomFieldFromProvider(LoginWith, Password, ExternalToken);
 
-            if (!ValidateLoginProvider(LoginWith))
-                throw new LoginProviderNotExistException(LoginWith.ToString());
-
-            if (ExpiredDate.HasValue && ExpiredDate.Value < DateTime.UtcNow)
-                throw new InvalidDateException(nameof(ExpiredDate), ExpiredDate.Value.ToString("dd MM yyyy"));
-            else if (ExpiredDate.HasValue && string.IsNullOrEmpty(InternalToken))
+            if (ExpiredToken.HasValue && ExpiredToken.Value < DateTime.UtcNow)
+                throw new InvalidDateException(nameof(ExpiredToken), ExpiredToken.Value.ToString("dd MM yyyy"));
+            else if (ExpiredToken.HasValue && string.IsNullOrEmpty(InternalToken))
                 throw new EmptyFieldException(nameof(InternalToken));
         }
 
-        private bool ValidateLoginProvider(int loginWith)
+        private void ValidateCustomFieldFromProvider(int loginWith, string password, string externalToken)
         {
             switch (loginWith)
             {
                 case (int)LoginProvider.Jwt:
+                    {
+                        if (!ValidatePassword(password))
+                            throw new PasswordNotValidException();
+
+                        break;
+                    }
+
                 case (int)LoginProvider.Google:
-                    return true;
+                    {
+                        if (string.IsNullOrEmpty(externalToken))
+                            throw new EmptyFieldException(nameof(ExternalToken));
+
+                        break;
+                    }
 
                 default:
-                    return false;
+                    throw new LoginProviderNotExistException(LoginWith.ToString());
             }
+        }
+
+        private bool ValidatePassword(string password)
+        {
+            var regex = new Regex(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{6,}$");
+            return regex.IsMatch(password);
         }
     }
 }

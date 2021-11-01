@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Web.Api.Models.User
+﻿namespace Web.Api.Models.User
 {
     public class NewUser
     {
@@ -11,6 +6,7 @@ namespace Web.Api.Models.User
         public string Surname { get; set; }
         public string Email { get; set; }
         public string ExternalToken { get; set; }
+        public string Password { get; set; }
         public int LoginWith { get; set; }
     }
 }

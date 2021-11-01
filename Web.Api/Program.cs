@@ -13,7 +13,7 @@ namespace Web.Api
         {
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .WriteTo.RollingFile("logs/api-{Hour}.txt")
+                .WriteTo.File("logs/api-{Hour}.txt")
                 .WriteTo.Console()
                 .CreateLogger();
 

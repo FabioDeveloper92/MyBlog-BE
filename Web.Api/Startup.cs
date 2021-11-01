@@ -1,19 +1,21 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Serialization;
 using MediatR;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using Serilog;
 using Web.Api.Filters;
 using Config;
 using Infrastructure.Write;
+using System.Text.Json;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Web.Api.Code;
 
 namespace Web.Api
 {
@@ -21,7 +23,7 @@ namespace Web.Api
     {
         public IConfiguration Configuration { get; }
 
-        private Microsoft.AspNetCore.Hosting.IHostingEnvironment _env;
+        private Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
         private TelemetryClient _telemetryClient;
 
         public Startup(IConfiguration configuration)
@@ -39,29 +41,31 @@ namespace Web.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddMvc(options =>
-                    options.Filters.AddService(typeof(ApiExceptionFilter)))
+                .AddMvc(options => options.Filters.AddService(typeof(ApiExceptionFilter)))
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+
+
+                    //options.JsonSerializerOptions.loop = ReferenceLoopHandling.Ignore;
                 });
 
             services.AddMemoryCache();
             services.AddScoped<ApiExceptionFilter>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.AddAuthentication(options =>
+             {
+                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+             }).AddJwtBearer();
+
+            // This is the tricky part to inject the configuration so the public key is ued to validate the JWT
+            services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
+
             MongoDBInstallmentMap.Map();
-
-            services.AddAuthentication()
-                .AddGoogle(options =>
-                {
-                    var clientId = Configuration.GetSection("Google:ClientId");
-                    var clientSecret = Configuration.GetSection("Google:ClientSecret");
-
-                    options.ClientId = clientId.Value;
-                    options.ClientSecret = clientSecret.Value;
-                });
         }
 
         private static void ConfigureCors(IApplicationBuilder app, Cors cors)
@@ -77,8 +81,8 @@ namespace Web.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IApplicationLifetime applicationLifetime,
-            Microsoft.AspNetCore.Hosting.IHostingEnvironment env, Cors cors, IMediator mediator)
+        public void Configure(IApplicationBuilder app, Microsoft.Extensions.Hosting.IHostApplicationLifetime applicationLifetime,
+            Microsoft.AspNetCore.Hosting.IWebHostEnvironment env, Cors cors, IMediator mediator)
         {
             if (env.IsDevelopment())
             {
@@ -89,35 +93,23 @@ namespace Web.Api
             ConfigureCors(app, cors);
             ConfigureFileServer(app);
 
-            app.UseAuthentication();
+            app.UseAuthentication()
+               .UseAuthorization();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "api/{controller}");
-            });
+            app.UseRouting()
+               .UseEndpoints(endpoints =>
+               {
+                   endpoints.MapControllerRoute("default", "{controller}");
+               });
 
             applicationLifetime.ApplicationStopping.Register(OnShutdown);
-
-            //try
-            //{
-            //    mediator.Send(new SynchronizeAdmins()).Wait();
-            //}
-            //catch (Exception e)
-            //{
-            //    Log.Information(
-            //        "Cannot synchronize admins from appsettings. Please check if admin are inserted correctly");
-            //}
-
-            // temporary
         }
 
         private void ConfigureLogger()
         {
             var conf = new LoggerConfiguration()
                 .Enrich.FromLogContext()
-                .WriteTo.RollingFile("logs/api-{Hour}.txt")
+                .WriteTo.File("logs/api-{Hour}.txt")
                 .WriteTo.Console();
 
             Log.Logger = conf.CreateLogger();

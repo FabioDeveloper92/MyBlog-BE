@@ -41,6 +41,13 @@ namespace Config.Ioc
                 })
              .SingleInstance();
 
+            builder.Register(c =>
+                new JwtKeys()
+                {
+                    PrivateKey = _configuration.GetSection("JwtKeys:PrivateKey").Value,
+                    PublicKey = _configuration.GetSection("JwtKeys:PublicKey").Value,
+                })
+             .SingleInstance();
         }
     }
 }

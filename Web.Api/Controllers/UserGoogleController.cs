@@ -19,41 +19,36 @@ namespace Web.Api.Controllers
 {
     [Route("api/[controller]")]
     [AllowAnonymous]
-    public class UserController
+    public class UserGoogleController
     {
         private readonly IMediator _mediator;
         private readonly ILogger _logger;
         private readonly IJwtGenerator _jwtGenerator;
         private readonly GoogleJsonWebSignature.ValidationSettings _settings;
-        public UserController(IMediator mediator, Config.GoogleAuth googleAuth, IJwtGenerator jwtGenerator, ILogger logger)
+        public UserGoogleController(IMediator mediator, Config.GoogleAuth googleAuth, IJwtGenerator jwtGenerator, ILogger logger)
         {
             _mediator = mediator;
             _logger = logger;
+
+            _settings = new GoogleJsonWebSignature.ValidationSettings();
+            _settings.Audience = new List<string>() { googleAuth.ClientId };
 
             _jwtGenerator = jwtGenerator;
         }
 
         [HttpPost]
-        public async Task<string> Post([FromBody] LoginUser item)
+        public async Task<string> Post([FromBody] NewUser item)
         {
+            var payload = GoogleJsonWebSignature.ValidateAsync(item.ExternalToken, _settings).Result;
+            if (payload == null)
+                throw new InvalidTokenException();
+
             var expiredDate = DateTime.Now.AddDays(5);
             var internalToken = _jwtGenerator.CreateUserAuthToken(item.Email, DateTime.Now.AddDays(5));
 
-            await _mediator.Send(new UpdateUserTokenJwt(item.Email, item.Password, internalToken, expiredDate));
+            await _mediator.Send(new CreateOrUpdateUser(item.Name, item.Surname, item.Email, string.Empty, item.ExternalToken, item.LoginWith, internalToken, expiredDate));
 
             return internalToken;
-        }
-
-        [HttpGet("{token}")]
-        public async Task<UserReadDto> Get(string token)
-        {
-            return await _mediator.Send(new GetUser(token));
-        }
-
-        [HttpDelete("{token}")]
-        public async Task Delete(string token)
-        {
-            await _mediator.Send(new LogoutUser(token));
         }
     }
 }

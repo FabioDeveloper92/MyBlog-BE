@@ -16,8 +16,10 @@ namespace Test.Common.Builders
                 {"Database:Name", "MyBlog_TEST"},
                 {"ConnectionStrings:MongoDBConnectionString","mongodb://localhost:27017"},
                 { "Cors:Enabled", "true" },
-                {"Google:ClientId","client"},
-                {"Google:ClientSecretId","clientId"}
+                {"Google:ClientId","clientId"},
+                {"Google:ClientSecretId","clientSecretId"},
+                {"JwtKeys:PrivateKey","key1"},
+                {"JwtKeys:PublicKey","key2"}
             };
 
             Add(defaultConfig);

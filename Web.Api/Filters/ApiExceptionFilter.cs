@@ -3,6 +3,7 @@ using Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Web.Api.Exceptions;
 
 namespace Web.Api.Filters
 {
@@ -22,6 +23,10 @@ namespace Web.Api.Filters
             if (context.Exception is NotFoundItemException)
             {
                 context.Result = new NotFoundResult();
+            }
+            else if (context.Exception is InvalidTokenException)
+            {
+                context.Result = new UnauthorizedResult();
             }
 
             if (context.Result == null)

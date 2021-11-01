@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Core;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,10 +8,10 @@ namespace Infrastructure.Write.User
 {
     public interface IUserWriteRepository
     {
-        Task<UserWriteDto> SingleOrDefault(string email, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Domain.User> SingleOrDefault(string email, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Domain.User> SingleOrDefaultByInternalToken(string internalToken, CancellationToken cancellationToken = default(CancellationToken));
         Task Add(Domain.User User, CancellationToken cancellationToken = default(CancellationToken));
         Task Update(Domain.User User, CancellationToken cancellationToken = default(CancellationToken));
-        Task UpdateInternalToken(string token, CancellationToken cancellationToken = default(CancellationToken));
     }
     public class UserWriteRepository : IUserWriteRepository
     {
@@ -25,10 +26,26 @@ namespace Infrastructure.Write.User
             _dbContext = mongoDbConnectionFactory.Connection.GetCollection<UserWriteDto>(UsersCollection);
         }
 
-        public async Task<UserWriteDto> SingleOrDefault(string email, CancellationToken cancellationToken = default)
+        public async Task<Domain.User> SingleOrDefault(string email, CancellationToken cancellationToken = default)
         {
             var filter = Builders<UserWriteDto>.Filter.Eq("Email", email);
-            return await _dbContext.Find(filter).FirstOrDefaultAsync();
+            var userWriteDto = await _dbContext.Find(filter).FirstOrDefaultAsync();
+
+            if (userWriteDto == null)
+                return null;
+
+            return Domain.User.Create(userWriteDto.Name, userWriteDto.Surname, userWriteDto.Email, userWriteDto.Password, userWriteDto.ExternalToken, userWriteDto.LoginWith, userWriteDto.InternalToken, userWriteDto.ExpiredToken, userWriteDto.Id);
+        }
+
+        public async Task<Domain.User> SingleOrDefaultByInternalToken(string internalToken, CancellationToken cancellationToken = default)
+        {
+            var filter = Builders<UserWriteDto>.Filter.Eq("InternalToken", internalToken);
+            var userWriteDto = await _dbContext.Find(filter).FirstOrDefaultAsync();
+
+            if (userWriteDto == null)
+                return null;
+
+            return Domain.User.Create(userWriteDto.Name, userWriteDto.Surname, userWriteDto.Email, userWriteDto.Password, userWriteDto.ExternalToken, userWriteDto.LoginWith, userWriteDto.InternalToken, userWriteDto.ExpiredToken, userWriteDto.Id);
         }
 
         public async Task Add(Domain.User User, CancellationToken cancellationToken = default)
@@ -53,14 +70,5 @@ namespace Infrastructure.Write.User
             await _dbContext.UpdateOneAsync(filter, update);
         }
 
-        public async Task UpdateInternalToken(string internalToken, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var filter = Builders<UserWriteDto>.Filter.Eq("InternalToken", internalToken);
-            var update = Builders<UserWriteDto>.Update.Set("InternalToken", string.Empty);
-
-            await _dbContext.UpdateOneAsync(filter, update);
-        }
     }
 }

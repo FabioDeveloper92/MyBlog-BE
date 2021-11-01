@@ -45,10 +45,17 @@ namespace Config.Test.Ioc
         public void should_resolve_GooogleAuth()
         {
             _scopeResolver.IsSingleInstance<GoogleAuth>();
-            _scopeResolver.Resolve<GoogleAuth>().ClientId.Should().Be("client");
-            _scopeResolver.Resolve<GoogleAuth>().ClientSecretId.Should().Be("clientId");
+            _scopeResolver.Resolve<GoogleAuth>().ClientId.Should().Be("clientId");
+            _scopeResolver.Resolve<GoogleAuth>().ClientSecretId.Should().Be("clientSecretId");
         }
 
+        [Fact]
+        public void should_resolve_JwtKeys()
+        {
+            _scopeResolver.IsSingleInstance<JwtKeys>();
+            _scopeResolver.Resolve<JwtKeys>().PrivateKey.Should().Be("key1");
+            _scopeResolver.Resolve<JwtKeys>().PublicKey.Should().Be("key2");
+        }
         public void Dispose()
         {
             _scopeResolver.Dispose();

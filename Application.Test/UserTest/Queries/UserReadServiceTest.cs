@@ -41,7 +41,7 @@ namespace Application.Test.UserTest.Queries
             var surname = "Wick";
             var email = "john@wick.it";
             var internalToken = Guid.NewGuid().ToString();
-            _sandbox.Scenario.WithUser(Guid.NewGuid(), name, surname, email, "pippo:12", Domain.LoginProvider.Google, internalToken, DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), name, surname, email, "pippo:12", internalToken, DateTime.Now.AddDays(5));
 
             //ACT
             var user = await _sandbox.Mediator.Send(new GetUser(internalToken));
@@ -57,7 +57,7 @@ namespace Application.Test.UserTest.Queries
         public void get_user_should_token_not_exist()
         {
             //ARRANGE
-            _sandbox.Scenario.WithUser(Guid.NewGuid(), "Fabio", "Test", "email@notexist.net", "123456", Domain.LoginProvider.Google, "123456", DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", "email@notexist.net", "123456", "123456", DateTime.Now.AddDays(5));
 
             //ACT 
             Func<Task> fn = async () => { await _sandbox.Mediator.Send(new GetUser("Fake")); };
@@ -71,7 +71,7 @@ namespace Application.Test.UserTest.Queries
         {
             //ARRANGE
             var internalToken = Guid.NewGuid().ToString();
-            _sandbox.Scenario.WithUser(Guid.NewGuid(), "Fabio", "Test", "email@expiredtoken.net", "123456", Domain.LoginProvider.Google, internalToken, DateTime.UtcNow.AddSeconds(1));
+            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", "email@expiredtoken.net", "123456", internalToken, DateTime.UtcNow.AddSeconds(1));
 
             System.Threading.Thread.Sleep(1000);
 
@@ -91,8 +91,8 @@ namespace Application.Test.UserTest.Queries
             var email = "john@wick.it";
             var internalToken = Guid.NewGuid().ToString();
             _sandbox.Scenario
-                     .WithUser(Guid.NewGuid(), name, surname, email, "pippo:12", Domain.LoginProvider.Google, Guid.NewGuid().ToString(), DateTime.Now.AddDays(5))
-                     .WithUser(Guid.NewGuid(), name, surname, email, "pippo:12", Domain.LoginProvider.Google, internalToken, DateTime.Now.AddDays(5));
+                     .WithGoogleUser(Guid.NewGuid(), name, surname, email, "pippo:12", Guid.NewGuid().ToString(), DateTime.Now.AddDays(5))
+                     .WithGoogleUser(Guid.NewGuid(), name, surname, email, "pippo:12", internalToken, DateTime.Now.AddDays(5));
 
             //ACT
             var user = await _sandbox.Mediator.Send(new GetUser(internalToken));
