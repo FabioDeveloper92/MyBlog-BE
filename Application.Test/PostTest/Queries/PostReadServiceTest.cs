@@ -169,26 +169,26 @@ namespace Application.Test.PostTest.Queries
         {
             //ARRANGE
             var postId1 = Guid.NewGuid();
-            const string postTitle1 = "My First Post";
-            const string postText1 = "This is an example";
+            const string postTitle1 = "SQL Example";
+            const string postText1 = "a b c d";
             var postCategories1 = new[] { 0 };
-            const string postImageUrl1 = "myFirstUrlPost";
-            const string postImageThumbUrl1 = "myFirstUrlPostThumb";
-            var d1 = new DateTime(2020, 7, 11);
+            const string postImageUrl1 = "url:code";
+            const string postImageThumbUrl1 = "thumb//ecc";
+            var d1 = new DateTime(2020, 8, 11);
             var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
-            var publishDate1 = DateTime.SpecifyKind(new DateTime(2021, 10, 25), DateTimeKind.Utc);
-            const string postCreateBy1 = "FabioAdmin";
+            var publishDate1 = DateTime.SpecifyKind(new DateTime(2021, 12, 12), DateTimeKind.Utc);
+            const string postCreateBy1 = "FabioAdmin2";
 
             var postId2 = Guid.NewGuid();
-            const string postTitle2 = "My Second Post";
-            const string postText2 = "This is a fake post";
-            var postCategories2 = new[] { 0 };
-            const string postImageUrl2 = "mySecondUrl";
-            const string postImageThumbUrl2 = "mySecondUrlThumb2";
-            var d2 = new DateTime(2021, 8, 18);
+            const string postTitle2 = "SQL Rel example";
+            const string postText2 = "fake fake";
+            var postCategories2 = new[] { 0, 1 };
+            const string postImageUrl2 = "what";
+            const string postImageThumbUrl2 = "when";
+            var d2 = new DateTime(2021, 8, 21);
             var postCreateDate2 = DateTime.SpecifyKind(d2, DateTimeKind.Utc);
-            var publishDate2 = DateTime.SpecifyKind(new DateTime(2022, 12, 1), DateTimeKind.Utc);
-            const string postCreateBy2 = "Fabio";
+            var publishDate2 = DateTime.SpecifyKind(new DateTime(2022, 12, 3), DateTimeKind.Utc);
+            const string postCreateBy2 = "FabioR";
 
             _sandbox.Scenario.WithPost(postId1, postTitle1, postText1, postCategories1, postImageUrl1, postImageThumbUrl1, postCreateDate1, postCreateDate1, publishDate1, postCreateBy1)
                              .And()
@@ -200,8 +200,6 @@ namespace Application.Test.PostTest.Queries
             var posts = await _sandbox.Mediator.Send(new GetPosts());
 
             //ASSERT
-            posts.Should().HaveCount(2);
-
             var firstPost = posts.Single(p => p.Id == postId1);
             var secondPost = posts.Single(p => p.Id == postId2);
 
@@ -219,9 +217,58 @@ namespace Application.Test.PostTest.Queries
             secondPost.ImageMain.Should().Be(postImageUrl2);
             secondPost.PublishDate.Should().NotBeNull().And.Be(publishDate2);
             secondPost.CreateBy.Should().Be(postCreateBy2);
-            secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+            secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories2.Length).And.Contain(postCategories2);
         }
 
+        [Fact]
+        public async Task create_three_post_and_return_two_post_overview_published()
+        {
+            //ARRANGE
+            var postId1 = Guid.NewGuid();
+            const string postTitle1 = "My First Post";
+            var postCategories1 = new[] { 0 };
+            const string postImageThumbUrl1 = "myFirstUrlPostThumb";
+            var d1 = new DateTime(2020, 7, 11);
+            var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
+            var publishDate1 = DateTime.SpecifyKind(new DateTime(2021, 10, 25), DateTimeKind.Utc);
+            const string postCreateBy1 = "FabioAdmin";
+
+            var postId2 = Guid.NewGuid();
+            const string postTitle2 = "My Second Post";
+            var postCategories2 = new[] { 0, 1 };
+            const string postImageThumbUrl2 = "mySecondUrlThumb2";
+            var d2 = new DateTime(2021, 8, 18);
+            var postCreateDate2 = DateTime.SpecifyKind(d2, DateTimeKind.Utc);
+            var publishDate2 = DateTime.SpecifyKind(new DateTime(2022, 12, 1), DateTimeKind.Utc);
+            const string postCreateBy2 = "Fabio";
+
+            _sandbox.Scenario.WithPost(postId1, postTitle1, "aaaa", postCategories1, "aaaa", postImageThumbUrl1, postCreateDate1, postCreateDate1, publishDate1, postCreateBy1)
+                             .And()
+                             .WithPost(postId2, postTitle2, "aaaa", postCategories2, "aaaa", postImageThumbUrl2, postCreateDate2, postCreateDate2, publishDate2, postCreateBy2)
+                             .And()
+                             .WithPost();
+
+            //ACT
+            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(3));
+
+            //ASSERT
+            var firstPost = posts.Single(p => p.Id == postId1);
+            var secondPost = posts.Single(p => p.Id == postId2);
+
+            firstPost.Id.Should().Be(postId1);
+            firstPost.Title.Should().Be(postTitle1);
+            firstPost.ImageThumb.Should().Be(postImageThumbUrl1);
+            firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
+            firstPost.CreateBy.Should().Be(postCreateBy1);
+            firstPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+
+            secondPost.Id.Should().Be(postId2);
+            secondPost.Title.Should().Be(postTitle2);
+            secondPost.ImageThumb.Should().Be(postImageThumbUrl2);
+            secondPost.PublishDate.Should().NotBeNull().And.Be(publishDate2);
+            secondPost.CreateBy.Should().Be(postCreateBy2);
+            secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories2.Length).And.Contain(postCategories2);
+        }
         public void Dispose()
         {
             _sandbox?.Dispose();

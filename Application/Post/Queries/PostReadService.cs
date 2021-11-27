@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 namespace Application.Post.Queries
 {
     public class PostReadService : IRequestHandler<GetPost, PostReadDto>,
-                                   IRequestHandler<GetPosts, List<PostReadDto>>
+                                   IRequestHandler<GetPosts, List<PostReadDto>>,
+                                   IRequestHandler<GetPostsOverview, List<PostOverviewReadDto>>
+
     {
         private readonly IPostReadRepository _postReadRepository;
 
@@ -23,6 +25,11 @@ namespace Application.Post.Queries
         public async Task<List<PostReadDto>> Handle(GetPosts request, CancellationToken cancellationToken)
         {
             return await _postReadRepository.GetAll();
+        }
+
+        public async Task<List<PostOverviewReadDto>> Handle(GetPostsOverview request, CancellationToken cancellationToken)
+        {
+            return await _postReadRepository.GetAllOverview(request.MaxItems);
         }
     }
 }

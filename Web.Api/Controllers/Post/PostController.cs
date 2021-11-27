@@ -24,7 +24,7 @@ namespace Web.Api.Controllers.Blog
         [HttpGet]
         public async Task<List<PostReadDto>> Get()
         {
-            return await _mediator.Send(new GetPosts());
+            return await _mediator.Send(new GetPostsOverview());
         }
 
         [HttpGet("{id}")]
@@ -39,17 +39,23 @@ namespace Web.Api.Controllers.Blog
             var guidId = Guid.NewGuid();
             var createDate = DateTime.Now;
 
-            await _mediator.Send(new CreatePost(guidId, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.Text, createDate, createDate, null));
+            DateTime? publishDate = null;
+            if (item.ToPublished)
+                publishDate = DateTime.Now;
+
+            await _mediator.Send(new CreatePost(guidId, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.Text, createDate, createDate, publishDate));
 
             return guidId.ToString();
         }
 
         //[HttpPut("{id}")]
-        //public async Task<string> Put(Guid id, [FromBody] NewPost item)
+        //public async Task<string> Put(Guid id, [FromBody] UpdatePost item)
         //{
         //    var postId = Guid.NewGuid();
-
-        //    await _mediator.Send(new CreatePost(postId, item.Title, item.Text, item.Category, item.ImageUrl, item.CreateDate, item.CreateBy));
+        // DateTime? publishDate = null;
+        //if (item.ToPublished)
+        //    publishDate = DateTime.Now;
+        //    await _mediator.Send(new UpdatePost(postId, item.Title, item.Text, item.Category, item.ImageUrl, item.CreateDate, item.CreateBy, publishDate));
 
         //    return postId.ToString();
         //}

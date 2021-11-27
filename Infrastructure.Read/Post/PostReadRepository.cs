@@ -11,6 +11,7 @@ namespace Infrastructure.Read.Post
     {
         Task<PostReadDto> SingleOrDefault(Guid id);
         Task<List<PostReadDto>> GetAll();
+        Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems);
     }
     public class PostReadRepository : IPostReadRepository
     {
@@ -37,9 +38,9 @@ namespace Infrastructure.Read.Post
 
         public async Task<List<PostReadDto>> GetAll()
         {
-            var filterPublishDate = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+            var filterPublishDateIsNull = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
 
-            var postsReadMapper = await _dbContext.Find(!filterPublishDate).ToListAsync();
+            var postsReadMapper = await _dbContext.Find(!filterPublishDateIsNull).ToListAsync();
 
             if (postsReadMapper == null)
                 return null;
@@ -49,6 +50,28 @@ namespace Infrastructure.Read.Post
             foreach (var postReadMapper in postsReadMapper)
             {
                 res.Add(postReadMapper.toPostReadDto());
+            }
+
+            return res;
+        }
+
+        public async Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems)
+        {
+            var filterPublishDateIsNull = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+
+            var postsReadMapper = await _dbContext.Find(!filterPublishDateIsNull)
+                                                  .SortByDescending(p => p.PublishDate)
+                                                  .Limit(maxItems)
+                                                  .ToListAsync();
+
+            if (postsReadMapper == null)
+                return null;
+
+            var res = new List<PostOverviewReadDto>();
+
+            foreach (var postReadMapper in postsReadMapper)
+            {
+                res.Add(postReadMapper.toPostOverViewReadDto());
             }
 
             return res;
