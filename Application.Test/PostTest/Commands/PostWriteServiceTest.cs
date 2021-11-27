@@ -10,6 +10,7 @@ using Xunit;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Infrastructure.Write;
+using Application.Post.Commands;
 
 namespace Application.Test.PostTest.Commands
 {
@@ -38,17 +39,17 @@ namespace Application.Test.PostTest.Commands
         public async Task create_post_should_create_a_new_post()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder().WithDefaults().Build();
+            var createPost = new CreatePostBuilder().WithDefaults().Build();
 
             //ACT
-            await _sandbox.Mediator.Send(createTask);
+            await _sandbox.Mediator.Send(createPost);
         }
 
         [Fact]
         public void create_post_with_title_is_void_should_exception()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithTitle("")
                 .WithText("the name is void")
                 .WithTags(new[] { 1 })
@@ -61,7 +62,7 @@ namespace Application.Test.PostTest.Commands
                 .Build();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createPost); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -71,7 +72,7 @@ namespace Application.Test.PostTest.Commands
         public void create_post_with_text_is_void_should_exception()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithTitle("title test")
                 .WithText("")
                 .WithTags(new[] { 1 })
@@ -84,7 +85,7 @@ namespace Application.Test.PostTest.Commands
                 .Build();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createPost); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -94,7 +95,7 @@ namespace Application.Test.PostTest.Commands
         public void create_post_with_createby_is_void_should_exception()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithTitle("title test")
                 .WithText("abcdef ghiflmno")
                 .WithTags(new[] { 1 })
@@ -107,7 +108,7 @@ namespace Application.Test.PostTest.Commands
                 .Build();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createPost); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -117,7 +118,7 @@ namespace Application.Test.PostTest.Commands
         public void create_post_with_imageurl_is_void_should_exception()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithTitle("title test")
                 .WithText("this a test")
                 .WithTags(new[] { 1 })
@@ -130,7 +131,7 @@ namespace Application.Test.PostTest.Commands
                 .Build();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createPost); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -140,23 +141,23 @@ namespace Application.Test.PostTest.Commands
         public async Task create_post_should_create_a_new_post_with_multi_tags()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder().WithDefaults().WithTags(new int[] { 1, 2, 3 }).Build();
+            var createPost = new CreatePostBuilder().WithDefaults().WithTags(new int[] { 1, 2, 3 }).Build();
 
             //ACT
-            await _sandbox.Mediator.Send(createTask);
+            await _sandbox.Mediator.Send(createPost);
         }
 
         [Fact]
         public void create_post_with_one_tag_is_invalid_should_exception()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithDefaults()
                 .WithTags(new[] { 1, 9999 })
                 .Build();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createPost); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -166,13 +167,13 @@ namespace Application.Test.PostTest.Commands
         public void create_post_with_tags_is_invalid_should_exception()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithDefaults()
                 .WithTags(new[] { 9991 })
                 .Build();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createPost); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -182,13 +183,13 @@ namespace Application.Test.PostTest.Commands
         public void create_post_with_tags_is_double_should_exception()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithDefaults()
                 .WithTags(new[] { 1, 1, 2 })
                 .Build();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createTask); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createPost); };
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
@@ -198,7 +199,7 @@ namespace Application.Test.PostTest.Commands
         public async void create_post_is_published()
         {
             //ARRANGE
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                 .WithTitle("title test")
                 .WithText("abcdef ghiflmno")
                 .WithTags(new[] { 1 })
@@ -212,7 +213,34 @@ namespace Application.Test.PostTest.Commands
                 .Build();
 
             //ACT 
-            await _sandbox.Mediator.Send(createTask);
+            await _sandbox.Mediator.Send(createPost);
+        }
+
+        [Fact]
+        public async void update_post()
+        {
+            //ARRANGE
+            var postId = Guid.NewGuid();
+            var d = new DateTime(2021, 8, 16);
+            var postCreateDate = DateTime.SpecifyKind(d, DateTimeKind.Utc);
+
+            _sandbox.Scenario.WithPost(postId, "Post", "<b>Hello</b>", new int[] { 1 }, "myUrl", "myFakeUrl", postCreateDate, postCreateDate, null, "alfa");
+
+            //ACT 
+            await _sandbox.Mediator.Send(new UpdatePost(postId, "a", "a", "a", "b", new int[] { 0 }, "b", DateTime.Now, DateTime.Now));
+        }
+
+        [Fact]
+        public void update_post_not_exist_should_exception()
+        {
+            //ARRANGE
+            _sandbox.Scenario.WithPost();
+
+            //ACT 
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new UpdatePost(Guid.NewGuid(), "a", "a", "a", "b", new int[] { 0 }, "b", DateTime.Now, DateTime.Now)); };
+
+            //ASSERT
+            fn.Should().Throw<PostNotFoundException>();
         }
 
         public void Dispose()

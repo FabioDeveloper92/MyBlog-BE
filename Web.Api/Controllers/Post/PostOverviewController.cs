@@ -21,7 +21,7 @@ namespace Web.Api.Controllers.Post
         [HttpGet]
         public async Task<List<PostOverviewReadDto>> Get()
         {
-            return await _mediator.Send(new GetPostsOverview());
+            return await _mediator.Send(new GetPostsOverview(3));
         }
     }
 }

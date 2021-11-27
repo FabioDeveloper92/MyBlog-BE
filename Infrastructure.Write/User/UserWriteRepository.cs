@@ -54,6 +54,7 @@ namespace Infrastructure.Write.User
             cancellationToken.ThrowIfCancellationRequested();
 
             await _dbContext.InsertOneAsync(userDto);
+
         }
 
         public async Task Update(Domain.User User, CancellationToken cancellationToken = default)

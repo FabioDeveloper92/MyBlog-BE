@@ -230,7 +230,7 @@ namespace Application.Test.PostTest.Queries
             const string postImageThumbUrl1 = "myFirstUrlPostThumb";
             var d1 = new DateTime(2020, 7, 11);
             var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
-            var publishDate1 = DateTime.SpecifyKind(new DateTime(2021, 10, 25), DateTimeKind.Utc);
+            var publishDate1 = DateTime.SpecifyKind(new DateTime(2099, 10, 25), DateTimeKind.Utc);
             const string postCreateBy1 = "FabioAdmin";
 
             var postId2 = Guid.NewGuid();
@@ -239,7 +239,7 @@ namespace Application.Test.PostTest.Queries
             const string postImageThumbUrl2 = "mySecondUrlThumb2";
             var d2 = new DateTime(2021, 8, 18);
             var postCreateDate2 = DateTime.SpecifyKind(d2, DateTimeKind.Utc);
-            var publishDate2 = DateTime.SpecifyKind(new DateTime(2022, 12, 1), DateTimeKind.Utc);
+            var publishDate2 = DateTime.SpecifyKind(new DateTime(2099, 12, 1), DateTimeKind.Utc);
             const string postCreateBy2 = "Fabio";
 
             _sandbox.Scenario.WithPost(postId1, postTitle1, "aaaa", postCategories1, "aaaa", postImageThumbUrl1, postCreateDate1, postCreateDate1, publishDate1, postCreateBy1)

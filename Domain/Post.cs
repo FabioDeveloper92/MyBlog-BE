@@ -18,7 +18,7 @@ namespace Domain
         public DateTime UpdateDate { get; private set; }
         public DateTime? PublishDate { get; private set; }
 
-        public Post(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate) : base(id)
+        private Post(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate) : base(id)
         {
             Title = title;
             ImageThumb = imageThumb;

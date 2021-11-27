@@ -48,17 +48,18 @@ namespace Web.Api.Controllers.Blog
             return guidId.ToString();
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<string> Put(Guid id, [FromBody] UpdatePost item)
-        //{
-        //    var postId = Guid.NewGuid();
-        // DateTime? publishDate = null;
-        //if (item.ToPublished)
-        //    publishDate = DateTime.Now;
-        //    await _mediator.Send(new UpdatePost(postId, item.Title, item.Text, item.Category, item.ImageUrl, item.CreateDate, item.CreateBy, publishDate));
+        [HttpPut("{id}")]
+        public async Task Put(Guid id, [FromBody] Models.Post.UpdatePost item)
+        {
+            var updateDate = DateTime.Now;
 
-        //    return postId.ToString();
-        //}
+            DateTime? publishDate = null;
+
+            if (item.ToPublished)
+                publishDate = DateTime.Now;
+
+            await _mediator.Send(new Application.Post.Commands.UpdatePost(id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.Text, updateDate, publishDate));
+        }
 
     }
 }
