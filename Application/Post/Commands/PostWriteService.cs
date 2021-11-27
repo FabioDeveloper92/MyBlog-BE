@@ -16,7 +16,7 @@ namespace Application.Post.Commands
 
         public async Task<Unit> Handle(CreatePost command, CancellationToken cancellationToken)
         {
-            var entity = Domain.Post.Create(command.Title, command.Text, command.Category, command.ImageUrl, command.CreateDate, command.CreateBy, command.PostId);
+            var entity = Domain.Post.Create(command.Title, command.ImageThumb, command.ImageMain, command.Text, command.Tags, command.CreateBy, command.CreateDate, command.UpdateDate, command.PublishDate, command.Id);
 
             await _postWriteRepository.Add(entity);
 

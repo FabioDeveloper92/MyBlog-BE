@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Core;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -15,21 +16,42 @@ namespace Infrastructure.Read.Post
     {
         private static string PostsCollection => "Posts";
 
-        private readonly IMongoCollection<PostReadDto> _dbContext;
+        private readonly IMongoCollection<PostReadMapper> _dbContext;
         public PostReadRepository(IMongoDbConnectionFactory mongoDbConnectionFactory)
         {
-            _dbContext = mongoDbConnectionFactory.Connection.GetCollection<PostReadDto>(PostsCollection);
+            _dbContext = mongoDbConnectionFactory.Connection.GetCollection<PostReadMapper>(PostsCollection);
         }
 
         public async Task<PostReadDto> SingleOrDefault(Guid id)
         {
-            var filter = Builders<PostReadDto>.Filter.Eq("_id", id);
-            return await _dbContext.Find(filter).FirstOrDefaultAsync();
+            var filterId = Builders<PostReadMapper>.Filter.Eq("_id", id);
+            var filterPublishDate = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+
+            var postReadMapper = await _dbContext.Find(filterId & !filterPublishDate).FirstOrDefaultAsync();
+
+            if (postReadMapper == null)
+                return null;
+
+            return postReadMapper.toPostReadDto();
         }
 
         public async Task<List<PostReadDto>> GetAll()
         {
-            return await _dbContext.Find(_ => true).ToListAsync();
+            var filterPublishDate = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+
+            var postsReadMapper = await _dbContext.Find(!filterPublishDate).ToListAsync();
+
+            if (postsReadMapper == null)
+                return null;
+
+            var res = new List<PostReadDto>();
+
+            foreach (var postReadMapper in postsReadMapper)
+            {
+                res.Add(postReadMapper.toPostReadDto());
+            }
+
+            return res;
         }
     }
 }

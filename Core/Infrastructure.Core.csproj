@@ -5,12 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Enum\**" />
-    <EmbeddedResource Remove="Enum\**" />
-    <None Remove="Enum\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Autofac" Version="6.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.12.4" />
   </ItemGroup>

@@ -1,35 +1,42 @@
 ﻿using System;
+using System.Linq;
 using Domain.Core;
 using Domain.Exceptions;
+using Infrastructure.Core.Enum;
 
 namespace Domain
 {
     public class Post : Entity<Guid>
     {
         public string Title { get; private set; }
+        public string ImageThumb { get; private set; }
+        public string ImageMain { get; private set; }
         public string Text { get; private set; }
-        public int Category { get; private set; }
-        public string ImageUrl { get; private set; }
-        public DateTime CreateDate { get; private set; }
+        public int[] Tags { get; private set; }
         public string CreateBy { get; private set; }
+        public DateTime CreateDate { get; private set; }
+        public DateTime UpdateDate { get; private set; }
+        public DateTime? PublishDate { get; private set; }
 
-
-        private Post(Guid id, string title, string text, int category, string imageUrl, DateTime createDate, string createBy) : base(id)
+        public Post(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate) : base(id)
         {
             Title = title;
+            ImageThumb = imageThumb;
+            ImageMain = imageMain;
             Text = text;
-            Category = category;
-            ImageUrl = imageUrl;
-            CreateDate = createDate;
+            Tags = tags;
             CreateBy = createBy;
+            CreateDate = createDate;
+            UpdateDate = updateDate;
+            PublishDate = publishDate;
         }
 
-        public static Post Create(string title, string text, int category, string imageUrl, DateTime createDate, string createBy, Guid? postId = null)
+        public static Post Create(string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, Guid? postId = null)
         {
             if (postId == null)
                 postId = Guid.NewGuid();
 
-            var item = new Post(postId.Value, title, text, category, imageUrl, createDate, createBy);
+            var item = new Post(postId.Value, title, imageThumb, imageMain, text, tags, createBy, createDate, updateDate, publishDate);
 
             item.Validate();
 
@@ -42,30 +49,45 @@ namespace Domain
             Validate();
         }
 
-        public void SetText(string text)
+        public void SetImageThumb(string imageThumb)
         {
-            Text = text;
+            ImageThumb = imageThumb;
             Validate();
         }
 
-        public void SetCategory(int category)
+        public void SetImageMain(string imageMain)
         {
-            Category = category;
+            ImageMain = imageMain;
             Validate();
         }
-        public void SetImageUrl(string imageUrl)
+
+        public void SetTags(int[] tags)
         {
-            ImageUrl = imageUrl;
+            Tags = tags;
             Validate();
         }
+
+        public void SetCreateBy(string createBy)
+        {
+            CreateBy = createBy;
+            Validate();
+        }
+
         public void SetCreateDate(DateTime createDate)
         {
             CreateDate = createDate;
             Validate();
         }
-        public void SetCreateBy(string createBy)
+
+        public void SetUpdateDate(DateTime updateDate)
         {
-            CreateBy = createBy;
+            UpdateDate = updateDate;
+            Validate();
+        }
+
+        public void SetPublishDate(DateTime? publishDate)
+        {
+            PublishDate = publishDate;
             Validate();
         }
 
@@ -77,11 +99,37 @@ namespace Domain
             if (string.IsNullOrEmpty(Text))
                 throw new EmptyFieldException(nameof(Text));
 
-            if (string.IsNullOrEmpty(ImageUrl))
-                throw new EmptyFieldException(nameof(ImageUrl)); 
-            
+            if (string.IsNullOrEmpty(ImageThumb))
+                throw new EmptyFieldException(nameof(ImageThumb));
+
+            if (string.IsNullOrEmpty(ImageMain))
+                throw new EmptyFieldException(nameof(ImageMain));
+
             if (string.IsNullOrEmpty(CreateBy))
                 throw new EmptyFieldException(nameof(CreateBy));
+
+            if (Tags == null || Tags.Length == 0 || !TagsAvailable())
+                throw new EmptyFieldException(nameof(Tags));
+
+            if (CreateDate == null)
+                throw new EmptyFieldException(nameof(CreateDate));
+
+            if (UpdateDate == null)
+                throw new EmptyFieldException(nameof(UpdateDate));
+
+            if (CreateDate > UpdateDate)
+                throw new InvalidDateException(nameof(UpdateDate), "");
+
+            if (PublishDate.HasValue && PublishDate.Value < UpdateDate)
+                throw new InvalidDateException(nameof(UpdateDate), "");
+        }
+
+        private bool TagsAvailable()
+        {
+            var tagsAvailable = ((CategoryPost[])Enum.GetValues(typeof(CategoryPost))).Select(s => (int)s).ToList();
+            var itemDiff = Tags.Intersect(tagsAvailable).Count();
+
+            return itemDiff == Tags.Length;
         }
     }
 }

@@ -7,19 +7,19 @@ namespace Infrastructure.Read.Post
     {
         public string Title { get; }
         public string Text { get; }
-        public int Category { get; }
-        public string ImageUrl { get; }
-        public DateTime CreateDate { get; }
+        public string ImageMain { get; }
+        public int[] Tags { get; }
         public string CreateBy { get; }
-
-        public PostReadDto(Guid id, string title, string text, int category, string imageUrl, DateTime createDate, string createBy) : base(id)
+        public DateTime? PublishDate { get; }
+        
+        public PostReadDto(Guid id, string title, string text, string imageMain, int[] tags, string createBy, DateTime? publishDate) : base(id)
         {
             Title = title;
             Text = text;
-            Category = category;
-            ImageUrl = imageUrl;
-            CreateDate = createDate;
+            ImageMain = imageMain;
+            Tags = tags;
             CreateBy = createBy;
+            PublishDate = publishDate;
         }
 
     }

@@ -21,6 +21,7 @@ namespace Web.Api.Controllers
         {
             _mediator = mediator;
             _logger = logger;
+            _jwtGenerator = jwtGenerator;
         }
 
         [HttpPost]

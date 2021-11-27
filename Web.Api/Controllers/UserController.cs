@@ -1,18 +1,13 @@
 ﻿using Application.User.Commands;
 using Application.User.Queries;
-using Google.Apis.Auth;
 using Infrastructure.Read.User;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Web.Api.Code;
-using Web.Api.Exceptions;
 using Web.Api.Models.User;
 
 namespace Web.Api.Controllers
@@ -24,8 +19,7 @@ namespace Web.Api.Controllers
         private readonly IMediator _mediator;
         private readonly ILogger _logger;
         private readonly IJwtGenerator _jwtGenerator;
-        private readonly GoogleJsonWebSignature.ValidationSettings _settings;
-        public UserController(IMediator mediator, Config.GoogleAuth googleAuth, IJwtGenerator jwtGenerator, ILogger logger)
+        public UserController(IMediator mediator, IJwtGenerator jwtGenerator, ILogger logger)
         {
             _mediator = mediator;
             _logger = logger;

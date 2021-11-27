@@ -19,9 +19,12 @@ namespace Test.Infrastructure.Common.Scenario
                 .WithId(Guid.NewGuid())
                 .WithTitle("Default Name")
                 .WithText("Default Description")
-                .WithCategory(0)
-                .WithImageUrl("urlfake")
+                .WithTags(new[] { 1 })
+                .WithImageMain("imgMainUrl")
+                .WithImageThumb("imgThumbUrl")
                 .WithCreateDate(DateTime.Now)
+                .WithUpdateDate(DateTime.Now)
+                .WithPublishDate(null)
                 .WithCreateBy("Fabio")
                 .Build();
 
@@ -30,15 +33,18 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
-        public Scenario WithPost(Guid id, string title, string text, int category, string imageUrl, DateTime createDate, string createBy)
+        public Scenario WithPost(Guid id, string title, string text, int[] tags, string imageMain, string imageThumb, DateTime createDate, DateTime updateDate, DateTime? publishDate, string createBy)
         {
             var createTask = new CreatePostBuilder()
                .WithId(id)
                .WithTitle(title)
                .WithText(text)
-               .WithCategory(category)
-               .WithImageUrl(imageUrl)
+               .WithTags(tags)
+               .WithImageMain(imageMain)
+               .WithImageThumb(imageThumb)
                .WithCreateDate(createDate)
+               .WithUpdateDate(updateDate)
+               .WithPublishDate(publishDate)
                .WithCreateBy(createBy)
                .Build();
 

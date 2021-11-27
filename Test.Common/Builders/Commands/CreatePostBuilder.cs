@@ -8,21 +8,29 @@ namespace Test.Common.Builders.Commands
         private Guid _id;
         private string _title;
         private string _text;
-        private int _category;
-        private string _imageUrl;
-        private DateTime _createDate;
+        private string _imageThumb;
+        private string _imageMain;
+        private int[] _tags;
         private string _createBy;
+        private DateTime _createDate;
+        private DateTime _updateDate;
+        private DateTime? _publishDate;
 
         public CreatePostBuilder WithDefaults()
         {
             _id = Guid.NewGuid();
             _title = "Test every moment";
             _text = "This is default value";
-            _category = 0;
-            _imageUrl = "imageUrl";
-            _createDate = new DateTime();
+            _imageMain = "imgUrlMain";
+            _imageThumb = "imageUrlThumb";
+            _tags = new[] { 1 };
             _createBy = "Fabio";
-            
+
+            var date = DateTime.Now;
+            _createDate = date;
+            _updateDate = date;
+            _publishDate = null;
+
             return this;
         }
 
@@ -43,22 +51,39 @@ namespace Test.Common.Builders.Commands
             _text = description;
             return this;
         }
-        
-        public CreatePostBuilder WithCategory(int category)
+
+        public CreatePostBuilder WithImageMain(string imageMain)
         {
-            _category = category;
+            _imageMain = imageMain;
             return this;
         }
 
-        public CreatePostBuilder WithImageUrl(string imageUrl)
+        public CreatePostBuilder WithImageThumb(string imageThumb)
         {
-            _imageUrl = imageUrl;
+            _imageThumb = imageThumb;
+            return this;
+        }
+
+        public CreatePostBuilder WithTags(int[] tags)
+        {
+            _tags = tags;
             return this;
         }
 
         public CreatePostBuilder WithCreateDate(DateTime createDate)
         {
             _createDate = createDate;
+            return this;
+        }
+
+        public CreatePostBuilder WithUpdateDate(DateTime updateDate)
+        {
+            _updateDate = updateDate;
+            return this;
+        }
+        public CreatePostBuilder WithPublishDate(DateTime? publishDate)
+        {
+            _publishDate = publishDate;
             return this;
         }
 
@@ -71,7 +96,7 @@ namespace Test.Common.Builders.Commands
 
         public CreatePost Build()
         {
-            return new CreatePost(_id, _title, _text, _category, _imageUrl, _createDate, _createBy);
+            return new CreatePost(_id, _title, _imageThumb, _imageMain, _text, _tags, _createBy, _createDate, _updateDate, _publishDate);
         }
     }
 }

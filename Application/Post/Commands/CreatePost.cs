@@ -5,25 +5,29 @@ namespace Application.Post.Commands
 {
     public class CreatePost : ICommand
     {
-        public Guid PostId { get; }
-        public string Title { get; }
-        public string Text { get; }
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+        public string ImageThumb { get; set; }
+        public string ImageMain { get; set; }
+        public string Text { get; set; }
+        public int[] Tags { get; set; }
+        public string CreateBy { get; set; }
+        public DateTime CreateDate { get; set; }
+        public DateTime UpdateDate { get; set; }
+        public DateTime? PublishDate { get; set; }
 
-        public int Category { get; }
-        public string ImageUrl { get; }
-        public DateTime CreateDate { get; }
-        public string CreateBy { get; }
-
-        public CreatePost(Guid postId, string title, string text, int category, string imageUrl, DateTime createDate, string createBy)
+        public CreatePost(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate)
         {
-            PostId = postId;
+            Id = id;
             Title = title;
+            ImageThumb = imageThumb;
+            ImageMain = imageMain;
             Text = text;
-            Category = category;
-            ImageUrl = imageUrl;
-            CreateDate = createDate;
+            Tags = tags;
             CreateBy = createBy;
+            CreateDate = createDate;
+            UpdateDate = updateDate;
+            PublishDate = publishDate;
         }
-
     }
 }

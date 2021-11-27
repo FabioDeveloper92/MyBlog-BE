@@ -16,11 +16,14 @@ namespace Infrastructure.Write.Post
 
                 map.MapMember(x => x.Title).SetIsRequired(true);
                 map.MapMember(x => x.Text).SetIsRequired(true);
-                map.MapMember(x => x.Category).SetIsRequired(true);
+                map.MapMember(x => x.ImageThumb).SetIsRequired(true);
+                map.MapMember(x => x.ImageMain).SetIsRequired(true);
                 map.MapMember(x => x.CreateBy).SetIsRequired(true);
-                map.MapMember(x => x.ImageUrl).SetIsRequired(true);
+                map.MapMember(x => x.Text).SetIsRequired(true);
 
-                map.MapMember(x => x.CreateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Local)); ;
+                map.MapMember(x => x.CreateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Utc));
+                map.MapMember(x => x.UpdateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Utc));
+                map.MapMember(x => x.PublishDate).SetIsRequired(false).SetSerializer(new DateTimeNullableSerializer(DateTimeKind.Utc));
             });
         }
     }
