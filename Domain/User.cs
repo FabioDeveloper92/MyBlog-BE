@@ -104,9 +104,7 @@ namespace Domain
 
             ValidateCustomFieldFromProvider(LoginWith, Password, ExternalToken);
 
-            if (ExpiredToken.HasValue && ExpiredToken.Value < DateTime.UtcNow)
-                throw new InvalidDateException(nameof(ExpiredToken), ExpiredToken.Value.ToString("dd MM yyyy"));
-            else if (ExpiredToken.HasValue && string.IsNullOrEmpty(InternalToken))
+            if (ExpiredToken.HasValue && string.IsNullOrEmpty(InternalToken))
                 throw new EmptyFieldException(nameof(InternalToken));
         }
 

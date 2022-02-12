@@ -1,6 +1,7 @@
 ﻿using Infrastructure.Core;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -66,7 +67,8 @@ namespace Infrastructure.Write.User
             var update = Builders<UserWriteDto>.Update.Set("Name", userDto.Name)
                                                       .Set("Surname", userDto.Surname)
                                                       .Set("InternalToken", userDto.InternalToken)
-                                                      .Set("ExternalToken", userDto.ExternalToken);
+                                                      .Set("ExternalToken", userDto.ExternalToken)
+                                                      .Set("ExpiredToken", userDto.ExpiredToken ?? null);
 
             await _dbContext.UpdateOneAsync(filter, update);
         }

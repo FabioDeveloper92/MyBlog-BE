@@ -41,10 +41,5 @@ namespace Infrastructure.Read.Post
         {
             return new PostReadDto(Id, Title, Text, ImageMain, Tags, CreateBy, PublishDate);
         }
-
-        internal PostOverviewReadDto toPostOverViewReadDto()
-        {
-            return new PostOverviewReadDto(Id, Title, ImageThumb, Tags, CreateBy, PublishDate);
-        }
     }
 }

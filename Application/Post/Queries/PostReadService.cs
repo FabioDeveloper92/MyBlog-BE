@@ -8,7 +8,8 @@ namespace Application.Post.Queries
 {
     public class PostReadService : IRequestHandler<GetPost, PostReadDto>,
                                    IRequestHandler<GetPosts, List<PostReadDto>>,
-                                   IRequestHandler<GetPostsOverview, List<PostOverviewReadDto>>
+                                   IRequestHandler<GetPostsOverview, List<PostOverviewReadDto>>,
+                                   IRequestHandler<GetPostUpdate, PostUpdateReadDto>
 
     {
         private readonly IPostReadRepository _postReadRepository;
@@ -30,6 +31,11 @@ namespace Application.Post.Queries
         public async Task<List<PostOverviewReadDto>> Handle(GetPostsOverview request, CancellationToken cancellationToken)
         {
             return await _postReadRepository.GetAllOverview(request.MaxItems);
+        }
+
+        public async Task<PostUpdateReadDto> Handle(GetPostUpdate request, CancellationToken cancellationToken)
+        {
+            return await _postReadRepository.GetPostAllFields(request.Id);
         }
     }
 }

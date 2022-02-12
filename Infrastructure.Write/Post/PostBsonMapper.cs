@@ -23,7 +23,7 @@ namespace Infrastructure.Write.Post
 
                 map.MapMember(x => x.CreateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Utc));
                 map.MapMember(x => x.UpdateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Utc));
-                map.MapMember(x => x.PublishDate).SetIsRequired(false).SetSerializer(new DateTimeNullableSerializer(DateTimeKind.Utc));
+                map.MapMember(x => x.PublishDate).SetIsRequired(false);
             });
         }
     }

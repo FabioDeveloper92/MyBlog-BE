@@ -1,6 +1,5 @@
 ﻿using Infrastructure.Core;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using System;
 
 namespace Infrastructure.Write.User
@@ -21,7 +20,7 @@ namespace Infrastructure.Write.User
                 map.MapMember(x => x.ExternalToken).SetIsRequired(true);
                 map.MapMember(x => x.LoginWith).SetIsRequired(true);
 
-                map.MapMember(x => x.ExpiredToken).SetSerializer(new DateTimeNullableSerializer(DateTimeKind.Utc));
+                map.MapMember(x => x.ExpiredToken).SetIsRequired(false);
             });
         }
     }

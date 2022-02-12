@@ -21,9 +21,9 @@ namespace Infrastructure.Read.User
 
         public async Task<UserReadDto> SingleOrDefault(string internalToken)
         {
-            var xxx = DateTime.UtcNow;
+            var validDateFrom = DateTime.UtcNow;
             var filter = Builders<UserReadDto>.Filter.Eq("InternalToken", internalToken)
-                        & Builders<UserReadDto>.Filter.Gt(x => x.ExpiredToken, xxx);
+                        & Builders<UserReadDto>.Filter.Gt(x => x.ExpiredToken, validDateFrom);
 
             var projection = Builders<UserReadDto>.Projection.Include("Name")
                                                              .Include("Surname")

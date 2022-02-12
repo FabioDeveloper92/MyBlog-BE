@@ -12,6 +12,7 @@ namespace Infrastructure.Read.Post
         Task<PostReadDto> SingleOrDefault(Guid id);
         Task<List<PostReadDto>> GetAll();
         Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems);
+        Task<PostUpdateReadDto> GetPostAllFields(Guid id);
     }
     public class PostReadRepository : IPostReadRepository
     {
@@ -28,53 +29,66 @@ namespace Infrastructure.Read.Post
             var filterId = Builders<PostReadMapper>.Filter.Eq("_id", id);
             var filterPublishDate = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
 
-            var postReadMapper = await _dbContext.Find(filterId & !filterPublishDate).FirstOrDefaultAsync();
+            var projection = Builders<PostReadMapper>.Projection
+                                                     .Include("Title")
+                                                     .Include("Text")
+                                                     .Include("ImageMain")
+                                                     .Include("Tags")
+                                                     .Include("CreateBy")
+                                                     .Include("PublishDate");
 
-            if (postReadMapper == null)
-                return null;
-
-            return postReadMapper.toPostReadDto();
+            return await _dbContext.Find(filterId & !filterPublishDate).Project<PostReadDto>(projection).FirstOrDefaultAsync();
         }
 
         public async Task<List<PostReadDto>> GetAll()
         {
             var filterPublishDateIsNull = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
 
-            var postsReadMapper = await _dbContext.Find(!filterPublishDateIsNull).ToListAsync();
+            var projection = Builders<PostReadMapper>.Projection
+                                                     .Include("Title")
+                                                     .Include("Text")
+                                                     .Include("ImageMain")
+                                                     .Include("Tags")
+                                                     .Include("CreateBy")
+                                                     .Include("PublishDate");
 
-            if (postsReadMapper == null)
-                return null;
-
-            var res = new List<PostReadDto>();
-
-            foreach (var postReadMapper in postsReadMapper)
-            {
-                res.Add(postReadMapper.toPostReadDto());
-            }
-
-            return res;
+            return await _dbContext.Find(!filterPublishDateIsNull).Project<PostReadDto>(projection).ToListAsync();
         }
 
         public async Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems)
         {
             var filterPublishDateIsNull = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
 
-            var postsReadMapper = await _dbContext.Find(!filterPublishDateIsNull)
-                                                  .SortByDescending(p => p.PublishDate)
-                                                  .Limit(maxItems)
-                                                  .ToListAsync();
+            var projection = Builders<PostReadMapper>.Projection
+                                                     .Include("Title")
+                                                     .Include("ImageThumb")
+                                                     .Include("Tags")
+                                                     .Include("CreateBy")
+                                                     .Include("PublishDate");
 
-            if (postsReadMapper == null)
-                return null;
+            return await _dbContext.Find(!filterPublishDateIsNull)
+                                    .Project<PostOverviewReadDto>(projection)
+                                    .SortByDescending(p => p.PublishDate)
+                                    .Limit(maxItems)
+                                    .ToListAsync();
+        }
 
-            var res = new List<PostOverviewReadDto>();
+        public async Task<PostUpdateReadDto> GetPostAllFields(Guid id)
+        {
+            var filterId = Builders<PostReadMapper>.Filter.Eq("_id", id);
 
-            foreach (var postReadMapper in postsReadMapper)
-            {
-                res.Add(postReadMapper.toPostOverViewReadDto());
-            }
+            var projection = Builders<PostReadMapper>.Projection
+                                                     .Include("Title")
+                                                     .Include("ImageThumb")
+                                                     .Include("ImageMain")
+                                                     .Include("Text")
+                                                     .Include("Tags")
+                                                     .Include("CreateBy")
+                                                     .Include("CreateDate")
+                                                     .Include("UpdateDate")
+                                                     .Include("PublishDate");
 
-            return res;
+            return await _dbContext.Find(filterId).Project<PostUpdateReadDto>(projection).FirstOrDefaultAsync();
         }
     }
 }

@@ -88,7 +88,7 @@ namespace Application.Test.UserTest.Queries
             //ARRANGE
             var name = "John";
             var surname = "Wick";
-            var email = "john@wick.it";
+            var email = "jonathan@wick.it";
             var internalToken = Guid.NewGuid().ToString();
             _sandbox.Scenario
                      .WithGoogleUser(Guid.NewGuid(), name, surname, email, "pippo:12", Guid.NewGuid().ToString(), DateTime.Now.AddDays(5))

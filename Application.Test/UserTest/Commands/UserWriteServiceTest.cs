@@ -103,19 +103,6 @@ namespace Application.Test.UserTest.Commands
         }
 
         [Fact]
-        public void create_user_with_invalid_date_should_exception()
-        {
-            //ARRANGE
-            var createUser = new CreateGoogleUserBuilder().WithDefaults().WithEmail("test6@mail.it").WithExpiredDate(DateTime.Now.AddDays(-1)).Build();
-
-            //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
-
-            //ASSERT
-            fn.Should().Throw<InvalidDateException>();
-        }
-
-        [Fact]
         public void create_user_with_name_is_void_should_exception()
         {
             //ARRANGE

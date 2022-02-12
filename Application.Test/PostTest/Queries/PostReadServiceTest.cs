@@ -269,6 +269,39 @@ namespace Application.Test.PostTest.Queries
             secondPost.CreateBy.Should().Be(postCreateBy2);
             secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories2.Length).And.Contain(postCategories2);
         }
+       
+        [Fact]
+        public async Task get_post_update_with_id_return_one_post()
+        {
+            //ARRANGE
+            var postId = Guid.NewGuid();
+            const string postTitle = "My First Post";
+            const string postText = "This is an example";
+            var postCategories = new int[1] { 0 };
+            const string postImageUrl = "myUrl";
+            const string postImageThumbUrl = "myUrl2";
+            var d = new DateTime(2021, 8, 16);
+            var postCreateDate = DateTime.SpecifyKind(d, DateTimeKind.Utc);
+            var publishDate = DateTime.SpecifyKind(new DateTime(2021, 11, 27), DateTimeKind.Utc);
+            const string postCreateBy = "Admin";
+
+            _sandbox.Scenario.WithPost(postId, postTitle, postText, postCategories, postImageUrl, postImageThumbUrl, postCreateDate, postCreateDate, publishDate, postCreateBy);
+
+            //ACT
+            var post = await _sandbox.Mediator.Send(new GetPostUpdate(postId));
+
+            //ASSERT
+            post.Id.Should().Be(postId);
+            post.Title.Should().Be(postTitle);
+            post.Text.Should().Be(postText);
+            post.ImageThumb.Should().Be(postImageThumbUrl);
+            post.ImageMain.Should().Be(postImageUrl);
+            post.CreateDate.Should().Be(postCreateDate);
+            post.UpdateDate.Should().Be(postCreateDate);
+            post.PublishDate.Should().NotBeNull().And.Be(publishDate);
+            post.CreateBy.Should().Be(postCreateBy);
+            post.Tags.Should().NotBeEmpty().And.HaveCount(postCategories.Length).And.Contain(postCategories);
+        }
         public void Dispose()
         {
             _sandbox?.Dispose();

@@ -24,7 +24,7 @@ namespace Web.Api.Controllers.Blog
         [HttpGet]
         public async Task<List<PostReadDto>> Get()
         {
-            return await _mediator.Send(new GetPostsOverview());
+            return await _mediator.Send(new GetPosts());
         }
 
         [HttpGet("{id}")]
@@ -46,19 +46,6 @@ namespace Web.Api.Controllers.Blog
             await _mediator.Send(new CreatePost(guidId, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.Text, createDate, createDate, publishDate));
 
             return guidId.ToString();
-        }
-
-        [HttpPut("{id}")]
-        public async Task Put(Guid id, [FromBody] Models.Post.UpdatePost item)
-        {
-            var updateDate = DateTime.Now;
-
-            DateTime? publishDate = null;
-
-            if (item.ToPublished)
-                publishDate = DateTime.Now;
-
-            await _mediator.Send(new Application.Post.Commands.UpdatePost(id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.Text, updateDate, publishDate));
         }
 
     }

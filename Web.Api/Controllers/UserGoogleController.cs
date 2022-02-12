@@ -43,8 +43,8 @@ namespace Web.Api.Controllers
             if (payload == null)
                 throw new InvalidTokenException();
 
-            var expiredDate = DateTime.Now.AddDays(5);
-            var internalToken = _jwtGenerator.CreateUserAuthToken(item.Email, DateTime.Now.AddDays(5));
+            var expiredDate = DateTime.UtcNow.AddDays(5);
+            var internalToken = _jwtGenerator.CreateUserAuthToken(item.Email, DateTime.UtcNow.AddDays(5));
 
             await _mediator.Send(new CreateOrUpdateUser(item.Name, item.Surname, item.Email, string.Empty, item.ExternalToken, item.LoginWith, internalToken, expiredDate));
 

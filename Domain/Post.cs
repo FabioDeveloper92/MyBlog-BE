@@ -120,7 +120,7 @@ namespace Domain
             if (CreateDate > UpdateDate)
                 throw new InvalidDateException(nameof(UpdateDate), "");
 
-            if (PublishDate.HasValue && PublishDate.Value < UpdateDate)
+            if (PublishDate.HasValue && (PublishDate.Value < UpdateDate || PublishDate.Value < CreateDate))
                 throw new InvalidDateException(nameof(UpdateDate), "");
         }
 
