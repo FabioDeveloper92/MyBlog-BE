@@ -24,6 +24,10 @@ namespace Web.Api.Filters
             {
                 context.Result = new NotFoundResult();
             }
+            else if (context.Exception is PostNotFoundException)
+            {
+                context.Result = new NotFoundResult();
+            }
             else if (context.Exception is InvalidTokenException)
             {
                 context.Result = new UnauthorizedResult();

@@ -1,4 +1,5 @@
-﻿using Infrastructure.Read.Post;
+﻿using Domain.Exceptions;
+using Infrastructure.Read.Post;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
@@ -20,7 +21,12 @@ namespace Application.Post.Queries
         }
         public async Task<PostReadDto> Handle(GetPost request, CancellationToken cancellationToken)
         {
-            return await _postReadRepository.SingleOrDefault(request.Id);
+            var post = await _postReadRepository.SingleOrDefault(request.Id);
+
+            if (post == null)
+                throw new PostNotFoundException();
+
+            return post;
         }
 
         public async Task<List<PostReadDto>> Handle(GetPosts request, CancellationToken cancellationToken)
@@ -35,7 +41,11 @@ namespace Application.Post.Queries
 
         public async Task<PostUpdateReadDto> Handle(GetPostUpdate request, CancellationToken cancellationToken)
         {
-            return await _postReadRepository.GetPostAllFields(request.Id);
+            var post= await _postReadRepository.GetPostAllFields(request.Id);
+            if (post == null)
+                throw new PostNotFoundException();
+
+            return post;
         }
     }
 }
