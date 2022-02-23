@@ -4,10 +4,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
-    <StartupObject />
+    <StartupObject>Web.Api.Program</StartupObject>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.Identity.MongoDbCore" Version="3.1.2" />
     <PackageReference Include="Autofac" Version="6.3.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.55.0" />

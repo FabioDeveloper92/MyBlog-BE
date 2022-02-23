@@ -2,7 +2,7 @@
 
 namespace Web.Api.Exceptions
 {
-    public class InvalidTokenException : Exception
+    public class InvalidGoogleTokenException : Exception
     {
     }
 }

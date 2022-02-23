@@ -11,8 +11,6 @@ namespace Test.Common.Builders.Commands
         public string _surname;
         public string _email;
         public string _password;
-        public string _internalToken;
-        public DateTime? _expiredDate;
 
         public CreateJwtUserBuilder WithDefaults()
         {
@@ -21,8 +19,6 @@ namespace Test.Common.Builders.Commands
             _surname = "Boh";
             _email = "fabio@test.it";
             _password = "Fake100*";
-            _internalToken = Guid.NewGuid().ToString();
-            _expiredDate = DateTime.Now.AddDays(5);
 
             return this;
         }
@@ -56,21 +52,9 @@ namespace Test.Common.Builders.Commands
             _password = password;
             return this;
         }
-        public CreateJwtUserBuilder WithInternalToken(string internalToken)
-        {
-            _internalToken = internalToken;
-            return this;
-        }
-
-        public CreateJwtUserBuilder WithExpiredDate(DateTime? expiredDate)
-        {
-            _expiredDate = expiredDate;
-            return this;
-        }
-
         public CreateUserFromJwt Build()
         {
-            return new CreateUserFromJwt(_name, _surname, _email, _password, "", (int)LoginProvider.Jwt, _internalToken, _expiredDate);
+            return new CreateUserFromJwt(_name, _surname, _email, _password, (int)LoginProvider.Jwt);
         }
     }
 }

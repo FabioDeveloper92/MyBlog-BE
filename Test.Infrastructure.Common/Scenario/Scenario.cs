@@ -60,9 +60,6 @@ namespace Test.Infrastructure.Common.Scenario
                 .WithName("Name")
                 .WithSurname("Surname")
                 .WithEmail("default@test.it")
-                .WithExternalToken("externalToken")
-                .WithInternalToken(Guid.NewGuid().ToString())
-                .WithExpiredDate(DateTime.Now.AddDays(5))
                 .Build();
 
             _mediator.Send(createUser).Wait();
@@ -70,16 +67,13 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
-        public Scenario WithGoogleUser(Guid id, string name, string surname, string email, string externalToken, string internalToken, DateTime? expiredDate)
+        public Scenario WithGoogleUser(Guid id, string name, string surname, string email)
         {
             var createUser = new CreateGoogleUserBuilder()
                 .WithId(id)
                 .WithName(name)
                 .WithSurname(surname)
                 .WithEmail(email)
-                .WithExternalToken(externalToken)
-                .WithInternalToken(internalToken)
-                .WithExpiredDate(expiredDate)
                 .Build();
 
             _mediator.Send(createUser).Wait();
@@ -87,7 +81,7 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
-        public Scenario WithJWTUser(Guid id, string name, string surname, string email, string password, string internalToken, DateTime? expiredDate)
+        public Scenario WithJWTUser(Guid id, string name, string surname, string email, string password)
         {
             var createUser = new CreateJwtUserBuilder()
                 .WithId(id)
@@ -95,8 +89,6 @@ namespace Test.Infrastructure.Common.Scenario
                 .WithSurname(surname)
                 .WithEmail(email)
                 .WithPassword(password)
-                .WithInternalToken(internalToken)
-                .WithExpiredDate(expiredDate)
                 .Build();
 
             _mediator.Send(createUser).Wait();

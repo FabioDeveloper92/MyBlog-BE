@@ -7,7 +7,7 @@ namespace Infrastructure.Read.User
 {
     public interface IUserReadRepository
     {
-        Task<UserReadDto> SingleOrDefault(string internalToken);
+        Task<UserReadDto> SingleOrDefault(string email);
     }
     public class UserReadRepository : IUserReadRepository
     {
@@ -19,17 +19,13 @@ namespace Infrastructure.Read.User
             _dbContext = mongoDbConnectionFactory.Connection.GetCollection<UserReadDto>(UsersCollection);
         }
 
-        public async Task<UserReadDto> SingleOrDefault(string internalToken)
+        public async Task<UserReadDto> SingleOrDefault(string email)
         {
-            var validDateFrom = DateTime.UtcNow;
-            var filter = Builders<UserReadDto>.Filter.Eq("InternalToken", internalToken)
-                        & Builders<UserReadDto>.Filter.Gt(x => x.ExpiredToken, validDateFrom);
+            var filter = Builders<UserReadDto>.Filter.Eq("Email", email);
 
             var projection = Builders<UserReadDto>.Projection.Include("Name")
                                                              .Include("Surname")
-                                                             .Include("Email")
-                                                             .Include("InternalToken")
-                                                             .Include("ExpiredToken");
+                                                             .Include("Email");
 
             return await _dbContext.Find(filter).Project<UserReadDto>(projection).FirstOrDefaultAsync();
         }

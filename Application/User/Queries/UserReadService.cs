@@ -15,7 +15,7 @@ namespace Application.User.Queries
         }
         public async Task<UserReadDto> Handle(GetUser request, CancellationToken cancellationToken)
         {
-            var userReadDto = await _userReadRepository.SingleOrDefault(request.InternalToken);
+            var userReadDto = await _userReadRepository.SingleOrDefault(request.Email);
 
             if (userReadDto == null)
                 throw new NotFoundItemException();

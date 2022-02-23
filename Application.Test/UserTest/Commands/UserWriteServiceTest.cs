@@ -51,7 +51,7 @@ namespace Application.Test.UserTest.Commands
             var email = "test2@mail.it";
             var updateUser = new CreateGoogleUserBuilder().WithDefaults().WithEmail(email).Build();
 
-            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", email, "123456", "123456", DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", email);
 
             //ACT
             await _sandbox.Mediator.Send(updateUser);
@@ -64,7 +64,7 @@ namespace Application.Test.UserTest.Commands
             var email = "test3@mail.it";
             var updateUser = new CreateJwtUserBuilder().WithDefaults().WithEmail(email).Build();
 
-            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", email, "123456", "123456", DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", email);
 
             //ACT 
             Func<Task> fn = async () => { await _sandbox.Mediator.Send(updateUser); };
@@ -80,26 +80,13 @@ namespace Application.Test.UserTest.Commands
             var email = "test4@mail.it";
             var updateUser = new CreateGoogleUserBuilder().WithDefaults().WithEmail(email).Build();
 
-            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", email, "Test200*", "123456", DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", email, "Test200*");
 
             //ACT 
             Func<Task> fn = async () => { await _sandbox.Mediator.Send(updateUser); };
 
             //ASSERT
             fn.Should().Throw<LoginWithWrongProviderException>();
-        }
-
-        [Fact]
-        public void create_user_with_empty_internal_token_should_exception()
-        {
-            //ARRANGE
-            var createUser = new CreateGoogleUserBuilder().WithDefaults().WithEmail("test5@mail.it").WithInternalToken("").Build();
-
-            //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
-
-            //ASSERT
-            fn.Should().Throw<EmptyFieldException>();
         }
 
         [Fact]
@@ -110,7 +97,6 @@ namespace Application.Test.UserTest.Commands
                 .WithName("")
                 .WithSurname("Surname")
                 .WithEmail("test7@mail.it")
-                .WithExternalToken("externalToken")
                 .Build();
 
             //ACT 
@@ -128,7 +114,6 @@ namespace Application.Test.UserTest.Commands
                 .WithName("abcde")
                 .WithSurname("")
                 .WithEmail("test8@mail.it")
-                .WithExternalToken("externalToken")
                 .Build();
 
             //ACT 
@@ -146,7 +131,6 @@ namespace Application.Test.UserTest.Commands
                 .WithName("abcde")
                 .WithSurname("aaaa")
                 .WithEmail("")
-                .WithExternalToken("externalToken")
                 .Build();
 
             //ACT 
@@ -154,48 +138,6 @@ namespace Application.Test.UserTest.Commands
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
-        }
-
-        [Fact]
-        public void create_user_with_external_token_is_void_should_exception()
-        {
-            //ARRANGE
-            var createUser = new CreateGoogleUserBuilder()
-               .WithName("name")
-               .WithSurname("Surname")
-               .WithEmail("test9@mail.it")
-               .WithExternalToken("")
-               .Build();
-
-            //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
-
-            //ASSERT
-            fn.Should().Throw<EmptyFieldException>();
-        }
-
-        [Fact]
-        public async void logout_user_with_internaltoken()
-        {
-            //ARRANGE
-            var internalToken =  Guid.NewGuid().ToString();
-            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", "test11@mail.it", "Test200*", internalToken, DateTime.Now.AddDays(5));
-
-            //ACT 
-            await _sandbox.Mediator.Send(new LogoutUser(internalToken));
-        }
-
-        [Fact]
-        public void logout_user_without_internaltoken()
-        {
-            //ARRANGE
-            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", "test11_B@mail.it", "Test200*", Guid.NewGuid().ToString(), DateTime.Now.AddDays(5));
-
-            //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new LogoutUser(Guid.NewGuid().ToString())); };
-
-            //ASSERT
-            fn.Should().Throw<UserNotExistException>();
         }
 
         [Fact]
@@ -215,7 +157,7 @@ namespace Application.Test.UserTest.Commands
             var email = "test14@mail.it";
             var createUser = new CreateJwtUserBuilder().WithDefaults().WithEmail(email).Build();
 
-            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", email, "Test200*", "123456", DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", email, "Test200*");
 
             //ACT 
             Func<Task> fn = async () => { await _sandbox.Mediator.Send(createUser); };
@@ -236,53 +178,6 @@ namespace Application.Test.UserTest.Commands
             //ASSERT
             fn.Should().Throw<PasswordNotValidException>();
         }
-
-        [Fact]
-        public async void login_with_user()
-        {
-            //ARRANGE
-            var mail = "test16@mail.it";
-            var pwd = "Test200*";
-            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", mail, pwd, "1234556", DateTime.Now.AddDays(5));
-
-            var updateUserTokenJwt = new UpdateUserTokenJwt(mail, pwd, Guid.NewGuid().ToString(), DateTime.Now.AddDays(5));
-
-            //ACT 
-            await _sandbox.Mediator.Send(updateUserTokenJwt);
-        }
-
-        [Fact]
-        public void login_with_user_not_exist()
-        {
-            //ARRANGE
-            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", "test17@mail.it", "Test200*", "1234556", DateTime.Now.AddDays(5));
-
-            var updateUserTokenJwt = new UpdateUserTokenJwt("email@notexist.it", "Test200*", Guid.NewGuid().ToString(), DateTime.Now.AddDays(5));
-
-            //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(updateUserTokenJwt); };
-
-            //ASSERT
-            fn.Should().Throw<UserNotExistException>();
-        }
-
-        [Fact]
-        public void login_with_user_exist_wrong_password()
-        {
-            //ARRANGE
-            var mail = "test18@mail.it";
-            var pwd = "Test200*";
-            _sandbox.Scenario.WithJWTUser(Guid.NewGuid(), "Fabio", "Test", mail, pwd, "1234556", DateTime.Now.AddDays(5));
-
-            var updateUserTokenJwt = new UpdateUserTokenJwt(mail, pwd + "WRONG", Guid.NewGuid().ToString(), DateTime.Now.AddDays(5));
-
-            //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(updateUserTokenJwt); };
-
-            //ASSERT
-            fn.Should().Throw<UserNotExistException>();
-        }
-
 
         public void Dispose()
         {

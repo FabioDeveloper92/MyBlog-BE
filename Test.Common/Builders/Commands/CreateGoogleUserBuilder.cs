@@ -10,9 +10,6 @@ namespace Test.Common.Builders.Commands
         public string _name;
         public string _surname;
         public string _email;
-        public string _externalToken;
-        public string _internalToken;
-        public DateTime? _expiredDate;
 
         public CreateGoogleUserBuilder WithDefaults()
         {
@@ -20,9 +17,6 @@ namespace Test.Common.Builders.Commands
             _name = "Fabio";
             _surname = "Boh";
             _email = "fabio@test.it";
-            _externalToken = "123456789";
-            _internalToken = Guid.NewGuid().ToString();
-            _expiredDate = DateTime.Now.AddDays(5);
 
             return this;
         }
@@ -49,29 +43,10 @@ namespace Test.Common.Builders.Commands
         {
             _email = email;
             return this;
-        }   
-        
-        public CreateGoogleUserBuilder WithExternalToken(string externalToken)
-        {
-            _externalToken = externalToken;
-            return this;
         }
-
-        public CreateGoogleUserBuilder WithInternalToken(string internalToken)
-        {
-            _internalToken = internalToken;
-            return this;
-        }
-
-        public CreateGoogleUserBuilder WithExpiredDate(DateTime? expiredDate)
-        {
-            _expiredDate = expiredDate;
-            return this;
-        }
-
         public CreateOrUpdateUser Build()
         {
-            return new CreateOrUpdateUser(_name, _surname, _email, "", _externalToken, (int)LoginProvider.Google, _internalToken, _expiredDate);
+            return new CreateOrUpdateUser(_name, _surname, _email, "", (int)LoginProvider.Google);
         }
     }
 }

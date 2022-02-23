@@ -28,7 +28,7 @@ namespace Web.Api.Filters
             {
                 context.Result = new NotFoundResult();
             }
-            else if (context.Exception is InvalidTokenException)
+            else if (context.Exception is InvalidGoogleTokenException)
             {
                 context.Result = new UnauthorizedResult();
             }

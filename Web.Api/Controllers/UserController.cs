@@ -3,51 +3,53 @@ using Application.User.Queries;
 using Infrastructure.Read.User;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 using System;
 using System.Threading.Tasks;
 using Web.Api.Code;
+using Web.Api.Models.Auth;
 using Web.Api.Models.User;
 
 namespace Web.Api.Controllers
 {
     [Route("api/[controller]")]
     [AllowAnonymous]
-    public class UserController
+    public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly ILogger _logger;
-        private readonly IJwtGenerator _jwtGenerator;
-        public UserController(IMediator mediator, IJwtGenerator jwtGenerator, ILogger logger)
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IJwtHandler _jwtHandler;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserController(IMediator mediator, IJwtHandler jwtHandler, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             _mediator = mediator;
-            _logger = logger;
 
-            _jwtGenerator = jwtGenerator;
+            _jwtHandler = jwtHandler;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost]
         public async Task<string> Post([FromBody] LoginUser item)
         {
-            var expiredDate = DateTime.Now.AddDays(5);
-            var internalToken = _jwtGenerator.CreateUserAuthToken(item.Email, DateTime.Now.AddDays(5));
+            var appUser = await _userManager.FindByEmailAsync(item.Email);
+            if (appUser == null)
+            {
+                throw new Exception();
+            }
 
-            await _mediator.Send(new UpdateUserTokenJwt(item.Email, item.Password, internalToken, expiredDate));
+            var token = _jwtHandler.GenerateToken(appUser);
 
-            return internalToken;
+            return token;
         }
 
-        [HttpGet("{token}")]
-        public async Task<UserReadDto> Get(string token)
+        [HttpGet]
+        [Authorize]
+        public async Task<UserReadDto> Get()
         {
-            return await _mediator.Send(new GetUser(token));
-        }
-
-        [HttpDelete("{token}")]
-        public async Task Delete(string token)
-        {
-            await _mediator.Send(new LogoutUser(token));
+            return await _mediator.Send(new GetUser(User.Identity.Name));
         }
     }
 }

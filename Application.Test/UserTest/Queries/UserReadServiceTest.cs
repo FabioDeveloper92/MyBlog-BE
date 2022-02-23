@@ -40,43 +40,25 @@ namespace Application.Test.UserTest.Queries
             var name = "John";
             var surname = "Wick";
             var email = "john@wick.it";
-            var internalToken = Guid.NewGuid().ToString();
-            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), name, surname, email, "pippo:12", internalToken, DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), name, surname, email);
 
             //ACT
-            var user = await _sandbox.Mediator.Send(new GetUser(internalToken));
+            var user = await _sandbox.Mediator.Send(new GetUser(email));
 
             //ASSERT
             user.Name.Should().Be(name);
             user.Surname.Should().Be(surname);
             user.Email.Should().Be(email);
-            user.InternalToken.Should().Be(internalToken);
         }
 
         [Fact]
         public void get_user_should_token_not_exist()
         {
             //ARRANGE
-            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", "email@notexist.net", "123456", "123456", DateTime.Now.AddDays(5));
+            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", "email@notexist.net");
 
             //ACT 
             Func<Task> fn = async () => { await _sandbox.Mediator.Send(new GetUser("Fake")); };
-
-            //ASSERT
-            fn.Should().Throw<NotFoundItemException>();
-        }
-
-        [Fact]
-        public void get_user_should_token_is_expired()
-        {
-            //ARRANGE
-            var internalToken = Guid.NewGuid().ToString();
-            _sandbox.Scenario.WithGoogleUser(Guid.NewGuid(), "Fabio", "Test", "email@expiredtoken.net", "123456", internalToken, DateTime.UtcNow.AddSeconds(1));
-
-            System.Threading.Thread.Sleep(1000);
-
-            //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new GetUser(internalToken)); };
 
             //ASSERT
             fn.Should().Throw<NotFoundItemException>();
@@ -89,19 +71,17 @@ namespace Application.Test.UserTest.Queries
             var name = "John";
             var surname = "Wick";
             var email = "jonathan@wick.it";
-            var internalToken = Guid.NewGuid().ToString();
             _sandbox.Scenario
-                     .WithGoogleUser(Guid.NewGuid(), name, surname, email, "pippo:12", Guid.NewGuid().ToString(), DateTime.Now.AddDays(5))
-                     .WithGoogleUser(Guid.NewGuid(), name, surname, email, "pippo:12", internalToken, DateTime.Now.AddDays(5));
+                     .WithGoogleUser(Guid.NewGuid(), name, surname, email)
+                     .WithGoogleUser(Guid.NewGuid(), name, surname, email);
 
             //ACT
-            var user = await _sandbox.Mediator.Send(new GetUser(internalToken));
+            var user = await _sandbox.Mediator.Send(new GetUser(email));
 
             //ASSERT
             user.Name.Should().Be(name);
             user.Surname.Should().Be(surname);
             user.Email.Should().Be(email);
-            user.InternalToken.Should().Be(internalToken);
         }
 
         public void Dispose()

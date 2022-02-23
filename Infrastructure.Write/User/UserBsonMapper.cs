@@ -16,11 +16,7 @@ namespace Infrastructure.Write.User
                 map.MapMember(x => x.Name).SetIsRequired(true);
                 map.MapMember(x => x.Surname).SetIsRequired(true);
                 map.MapMember(x => x.Email).SetIsRequired(true);
-
-                map.MapMember(x => x.ExternalToken).SetIsRequired(true);
                 map.MapMember(x => x.LoginWith).SetIsRequired(true);
-
-                map.MapMember(x => x.ExpiredToken).SetIsRequired(false);
             });
         }
     }

@@ -10,7 +10,8 @@ namespace Application.Post.Queries
     public class PostReadService : IRequestHandler<GetPost, PostReadDto>,
                                    IRequestHandler<GetPosts, List<PostReadDto>>,
                                    IRequestHandler<GetPostsOverview, List<PostOverviewReadDto>>,
-                                   IRequestHandler<GetPostUpdate, PostUpdateReadDto>
+                                   IRequestHandler<GetPostUpdate, PostUpdateReadDto>,
+                                   IRequestHandler<GetMyPostOverview, List<PostMyOverviewReadDto>>
 
     {
         private readonly IPostReadRepository _postReadRepository;
@@ -46,6 +47,11 @@ namespace Application.Post.Queries
                 throw new PostNotFoundException();
 
             return post;
+        }
+
+        public async Task<List<PostMyOverviewReadDto>> Handle(GetMyPostOverview request, CancellationToken cancellationToken)
+        {
+            return await _postReadRepository.GetMyPosts(request.Title, request.Status, request.OrderBy, request.Limit);
         }
     }
 }

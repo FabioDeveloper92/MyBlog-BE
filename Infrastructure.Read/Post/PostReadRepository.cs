@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Core;
+using Infrastructure.Core.Enum;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -13,6 +14,7 @@ namespace Infrastructure.Read.Post
         Task<List<PostReadDto>> GetAll();
         Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems);
         Task<PostUpdateReadDto> GetPostAllFields(Guid id);
+        Task<List<PostMyOverviewReadDto>> GetMyPosts(string title, FilterPostStatus filterStatus, OrderPostDate orderPost, int limit);
     }
     public class PostReadRepository : IPostReadRepository
     {
@@ -89,6 +91,46 @@ namespace Infrastructure.Read.Post
                                                      .Include("PublishDate");
 
             return await _dbContext.Find(filterId).Project<PostUpdateReadDto>(projection).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<PostMyOverviewReadDto>> GetMyPosts(string title, FilterPostStatus filterStatus, OrderPostDate orderPost, int limit)
+        {
+            var filterTitleContains = Builders<PostReadMapper>.Filter.Regex("Title", $".*{title}.*");
+
+            FilterDefinition<PostReadMapper> filterByStatus = null;
+            if (filterStatus == FilterPostStatus.Draft)
+            {
+                filterByStatus = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+            }
+            else if (filterStatus == FilterPostStatus.Published)
+            {
+                filterByStatus = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+            }
+
+            FilterDefinition<PostReadMapper> filter;
+            if (filterByStatus != null)
+            {
+                filter = Builders<PostReadMapper>.Filter.And(filterTitleContains, filterByStatus);
+            }
+            else
+            {
+                filter = filterTitleContains;
+            }
+
+            var projection = Builders<PostReadMapper>.Projection
+                                         .Include("Title")
+                                         .Include("CreateDate")
+                                         .Include("PublishDate");
+
+            var sort = Builders<PostReadMapper>.Sort.Ascending("CreateDate");
+            if (orderPost == OrderPostDate.RecentlyPublished)
+                sort = Builders<PostReadMapper>.Sort.Ascending("PublishDate");
+
+            return await _dbContext.Find(filter)
+                                   .Project<PostMyOverviewReadDto>(projection)
+                                   .Sort(sort)
+                                   .Limit(limit)
+                                   .ToListAsync();
         }
     }
 }

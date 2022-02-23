@@ -19,8 +19,7 @@ namespace Web.Api.Ioc
             builder.RegisterModule(new Config.Ioc.Module(_configuration));
             builder.RegisterModule(new Application.Ioc.Module());
 
-            builder.RegisterType<HttpContextProvider>().As<IContextProvider>();
-            builder.RegisterType<JwtGenerator>().As<IJwtGenerator>();
+            builder.RegisterType<JwtHandler>().As<IJwtHandler>();
         }
     }
 }

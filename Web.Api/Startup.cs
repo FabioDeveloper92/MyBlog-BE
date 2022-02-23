@@ -14,8 +14,9 @@ using Infrastructure.Write;
 using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
-using Web.Api.Code;
+using Web.Api.Models.Auth;
+using System;
+using System.Text;
 
 namespace Web.Api
 {
@@ -51,19 +52,47 @@ namespace Web.Api
                     //options.JsonSerializerOptions.loop = ReferenceLoopHandling.Ignore;
                 });
 
+
+            // FABIO
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                    .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
+                    (
+                        Configuration.GetSection("ConnectionStrings:MongoDBConnectionString").Value, Configuration.GetSection("Database:Name").Value
+                    );
+
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration.GetSection("JWTSettings:validIssuer").Value,
+                    ValidAudience = Configuration.GetSection("JWTSettings:validAudience").Value,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetSection("JWTSettings:securityKey").Value))
+                };
+            });
+
+            // FABIO
+
+
             services.AddMemoryCache();
             services.AddScoped<ApiExceptionFilter>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.AddAuthentication(options =>
-             {
-                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-             }).AddJwtBearer();
+            //services.AddAuthentication(options =>
+            // {
+            //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            // }).AddJwtBearer();
 
-            // This is the tricky part to inject the configuration so the public key is ued to validate the JWT
-            services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
+            //// This is the tricky part to inject the configuration so the public key is ued to validate the JWT
+            //services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
 
             MongoDBInstallmentMap.Map();
         }
@@ -93,10 +122,9 @@ namespace Web.Api
             ConfigureCors(app, cors);
             ConfigureFileServer(app);
 
-            app.UseAuthentication()
-               .UseAuthorization();
-
             app.UseRouting()
+               .UseAuthentication()
+               .UseAuthorization()
                .UseEndpoints(endpoints =>
                {
                    endpoints.MapControllerRoute("default", "{controller}");

@@ -20,29 +20,23 @@ namespace Domain
         public string Surname { get; private set; }
         public string Email { get; private set; }
         public string Password { get; private set; }
-        public string ExternalToken { get; private set; }
         public int LoginWith { get; private set; }
-        public string InternalToken { get; private set; }
-        public DateTime? ExpiredToken { get; private set; }
 
-        private User(Guid id, string name, string surname, string email, string password, string externalToken, int loginWith, string internalToken, DateTime? expiredToken) : base(id)
+        private User(Guid id, string name, string surname, string email, string password, int loginWith) : base(id)
         {
             Name = name;
             Surname = surname;
             Email = email;
             Password = password;
-            ExternalToken = externalToken;
             LoginWith = loginWith;
-            InternalToken = internalToken;
-            ExpiredToken = expiredToken;
         }
 
-        public static User Create(string name, string surname, string email, string password, string externalToken, int loginWith, string internalToken = null, DateTime? expiredToken = null, Guid? userId = null)
+        public static User Create(string name, string surname, string email, string password, int loginWith, Guid? userId = null)
         {
             if (userId == null)
                 userId = Guid.NewGuid();
 
-            var item = new User(userId.Value, name, surname, email, password, externalToken, loginWith, internalToken, expiredToken);
+            var item = new User(userId.Value, name, surname, email, password, loginWith);
 
             item.Validate();
 
@@ -73,24 +67,6 @@ namespace Domain
             Validate();
         }
 
-        public void SetExternalToken(string internalToken)
-        {
-            ExternalToken = internalToken;
-            Validate();
-        }
-
-        public void SetInternalToken(string internalToken)
-        {
-            InternalToken = internalToken;
-            Validate();
-        }
-
-        public void SetExpiredToken(DateTime? expiredToken)
-        {
-            ExpiredToken = expiredToken;
-            Validate();
-        }
-
         protected override void Validate()
         {
             if (string.IsNullOrEmpty(Name))
@@ -102,13 +78,10 @@ namespace Domain
             if (string.IsNullOrEmpty(Email))
                 throw new EmptyFieldException(nameof(Email));
 
-            ValidateCustomFieldFromProvider(LoginWith, Password, ExternalToken);
-
-            if (ExpiredToken.HasValue && string.IsNullOrEmpty(InternalToken))
-                throw new EmptyFieldException(nameof(InternalToken));
+            ValidateCustomFieldFromProvider(LoginWith, Password);
         }
 
-        private void ValidateCustomFieldFromProvider(int loginWith, string password, string externalToken)
+        private void ValidateCustomFieldFromProvider(int loginWith, string password)
         {
             switch (loginWith)
             {
@@ -122,10 +95,7 @@ namespace Domain
 
                 case (int)LoginProvider.Google:
                     {
-                        if (string.IsNullOrEmpty(externalToken))
-                            throw new EmptyFieldException(nameof(ExternalToken));
-
-                        break;
+                        return;
                     }
 
                 default:

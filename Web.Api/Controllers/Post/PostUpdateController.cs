@@ -1,18 +1,16 @@
-﻿using Application.Post.Commands;
-using Application.Post.Queries;
+﻿using Application.Post.Queries;
 using Infrastructure.Read.Post;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Web.Api.Models.Post;
 
 namespace Web.Api.Controllers.Blog
 {
     [Route("api/[controller]")]
-    //[Authorize]
-    public class PostUpdateController
+    [Authorize]
+    public class PostUpdateController : ControllerBase
     {
         private readonly IMediator _mediator;
 
@@ -37,8 +35,7 @@ namespace Web.Api.Controllers.Blog
             if (item.ToPublished)
                 publishDate = DateTime.Now;
 
-            await _mediator.Send(new Application.Post.Commands.UpdatePost(id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.Text, updateDate, publishDate));
+            await _mediator.Send(new Application.Post.Commands.UpdatePost(id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, User.Identity.Name, updateDate, publishDate));
         }
-
     }
 }

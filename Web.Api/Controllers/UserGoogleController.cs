@@ -1,18 +1,15 @@
 ﻿using Application.User.Commands;
-using Application.User.Queries;
 using Google.Apis.Auth;
-using Infrastructure.Read.User;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Web.Api.Code;
 using Web.Api.Exceptions;
+using Web.Api.Models.Auth;
 using Web.Api.Models.User;
 
 namespace Web.Api.Controllers
@@ -22,18 +19,20 @@ namespace Web.Api.Controllers
     public class UserGoogleController
     {
         private readonly IMediator _mediator;
-        private readonly ILogger _logger;
-        private readonly IJwtGenerator _jwtGenerator;
+        private readonly IJwtHandler _jwtHandler;
         private readonly GoogleJsonWebSignature.ValidationSettings _settings;
-        public UserGoogleController(IMediator mediator, Config.GoogleAuth googleAuth, IJwtGenerator jwtGenerator, ILogger logger)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public UserGoogleController(IMediator mediator, Config.GoogleAuth googleAuth, IJwtHandler jwtHandler, UserManager<ApplicationUser> userManager)
         {
             _mediator = mediator;
-            _logger = logger;
 
-            _settings = new GoogleJsonWebSignature.ValidationSettings();
-            _settings.Audience = new List<string>() { googleAuth.ClientId };
+            _settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new List<string>() { googleAuth.ClientId }
+            };
 
-            _jwtGenerator = jwtGenerator;
+            _jwtHandler = jwtHandler;
+            _userManager = userManager;
         }
 
         [HttpPost]
@@ -41,14 +40,28 @@ namespace Web.Api.Controllers
         {
             var payload = GoogleJsonWebSignature.ValidateAsync(item.ExternalToken, _settings).Result;
             if (payload == null)
-                throw new InvalidTokenException();
+                throw new InvalidGoogleTokenException();
 
-            var expiredDate = DateTime.UtcNow.AddDays(5);
-            var internalToken = _jwtGenerator.CreateUserAuthToken(item.Email, DateTime.UtcNow.AddDays(5));
+            var appUser = await _userManager.FindByEmailAsync(item.Email);
+            if (appUser == null)
+            {
+                var createAppUser = new ApplicationUser
+                {
+                    UserName = item.Email,
+                    Email = item.Email
+                };
 
-            await _mediator.Send(new CreateOrUpdateUser(item.Name, item.Surname, item.Email, string.Empty, item.ExternalToken, item.LoginWith, internalToken, expiredDate));
+                var identityResult = await _userManager.CreateAsync(createAppUser, "Fabio_20");
 
-            return internalToken;
+                if (!identityResult.Succeeded)
+                    throw new Exception();
+            }
+
+            var token = _jwtHandler.GenerateToken(appUser);
+
+            await _mediator.Send(new CreateOrUpdateUser(item.Name, item.Surname, item.Email, string.Empty, item.LoginWith));
+
+            return token;
         }
     }
 }

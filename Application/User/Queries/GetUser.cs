@@ -5,11 +5,11 @@ namespace Application.User.Queries
 {
     public class GetUser : IQuery<UserReadDto>
     {
-        public string InternalToken { get; }
+        public string Email { get; }
 
-        public GetUser(string internalToken)
+        public GetUser(string email)
         {
-            InternalToken = internalToken;
+            Email = email;
         }
     }
 }
