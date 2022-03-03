@@ -7,13 +7,15 @@ namespace Application.Post.Queries
 {
     public class GetMyPostOverview : IQuery<List<PostMyOverviewReadDto>>
     {
+        public string UserEmail { get; }
         public string Title { get; }
         public FilterPostStatus Status { get; }
         public OrderPostDate OrderBy { get; }
         public int Limit { get; }
 
-        public GetMyPostOverview(string title, FilterPostStatus status, OrderPostDate orderBy, int limit)
+        public GetMyPostOverview(string userEmail, string title, FilterPostStatus status, OrderPostDate orderBy, int limit)
         {
+            UserEmail = userEmail;
             Title = title;
             Status = status;
             OrderBy = orderBy;

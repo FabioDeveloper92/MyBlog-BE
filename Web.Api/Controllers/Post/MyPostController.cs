@@ -11,7 +11,7 @@ namespace Web.Api.Controllers.Post
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class MyPostController
+    public class MyPostController:ControllerBase
     {
         private readonly IMediator _mediator;
 
@@ -23,7 +23,7 @@ namespace Web.Api.Controllers.Post
         [HttpPost]
         public async Task<List<PostMyOverviewReadDto>> Post([FromBody] Models.Post.FilterMyPost item)
         {
-            return await _mediator.Send(new GetMyPostOverview(item.Title, (FilterPostStatus)item.Status, (OrderPostDate)item.OrderByDate, item.Limit));
+            return await _mediator.Send(new GetMyPostOverview(User.Identity.Name, item.Title, (FilterPostStatus)item.Status, (OrderPostDate)item.OrderByDate, item.Limit));
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Application.Post.Queries
 
         public async Task<List<PostMyOverviewReadDto>> Handle(GetMyPostOverview request, CancellationToken cancellationToken)
         {
-            return await _postReadRepository.GetMyPosts(request.Title, request.Status, request.OrderBy, request.Limit);
+            return await _postReadRepository.GetMyPosts(request.UserEmail, request.Title, request.Status, request.OrderBy, request.Limit);
         }
     }
 }

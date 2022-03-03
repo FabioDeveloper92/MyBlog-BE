@@ -306,7 +306,7 @@ namespace Application.Test.PostTest.Queries
         }
         
         [Fact]
-        public async Task get_my_post_overview_update_return_two_post()
+        public async Task get_my_post_overview_return_two_post()
         {
             //ARRANGE
             var postId1 = Guid.NewGuid();
@@ -314,20 +314,19 @@ namespace Application.Test.PostTest.Queries
             var d1 = new DateTime(2022, 7, 11);
             var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
             var publishDate1 = DateTime.SpecifyKind(new DateTime(2099, 10, 25), DateTimeKind.Utc);
-            const string postCreateBy1 = "FabioAdmin";
+            const string postCreateBy = "FabioAdmin";
 
             var postId2 = Guid.NewGuid();
             const string postTitle2 = "My Second Post Overview";
             var d2 = new DateTime(2022, 8, 18);
             var postCreateDate2 = DateTime.SpecifyKind(d2, DateTimeKind.Utc);
-            const string postCreateBy2 = "FabioAdmin";
 
-            _sandbox.Scenario.WithPost(postId1, postTitle1, "desc1", new[] { 1, 2 }, "fistUrlT", "fistUrl", postCreateDate1, postCreateDate1, publishDate1, postCreateBy1)
+            _sandbox.Scenario.WithPost(postId1, postTitle1, "desc1", new[] { 1, 2 }, "fistUrlT", "fistUrl", postCreateDate1, postCreateDate1, publishDate1, postCreateBy)
                              .And()
-                             .WithPost(postId2, postTitle2, "desc2", new[] { 1 }, "secondUrlT", "secondUrl", postCreateDate2, postCreateDate2, null, postCreateBy2);
+                             .WithPost(postId2, postTitle2, "desc2", new[] { 1 }, "secondUrlT", "secondUrl", postCreateDate2, postCreateDate2, null, postCreateBy);
 
             //ACT
-            var posts = await _sandbox.Mediator.Send(new GetMyPostOverview("Overview", FilterPostStatus.AllState, OrderPostDate.RecentlyCreate, 5));
+            var posts = await _sandbox.Mediator.Send(new GetMyPostOverview(postCreateBy, "Overview", FilterPostStatus.AllState, OrderPostDate.RecentlyCreate, 5));
 
             //ASSERT
             var firstPost = posts.Single(p => p.Id == postId1);
@@ -342,6 +341,39 @@ namespace Application.Test.PostTest.Queries
             secondPost.Title.Should().Be(postTitle2);
             secondPost.PublishDate.Should().BeNull();
             secondPost.CreateDate.Should().Be(postCreateDate2);
+        }
+
+        [Fact]
+        public async Task get_my_post_overview_create_two_with_different_user_return_one_post()
+        {
+            //ARRANGE
+            var postId1 = Guid.NewGuid();
+            const string postTitle1 = "My First Post Overview2";
+            var d1 = new DateTime(2022, 7, 11);
+            var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
+            var publishDate1 = DateTime.SpecifyKind(new DateTime(2099, 10, 25), DateTimeKind.Utc);
+            const string postCreateBy1 = "FabioAdmin";
+
+            var postId2 = Guid.NewGuid();
+            const string postTitle2 = "My Second Post Overview2";
+            var d2 = new DateTime(2022, 8, 18);
+            var postCreateDate2 = DateTime.SpecifyKind(d2, DateTimeKind.Utc);
+            const string postCreateBy2 = "Fabio";
+
+            _sandbox.Scenario.WithPost(postId1, postTitle1, "desc1", new[] { 1, 2 }, "fistUrlT", "fistUrl", postCreateDate1, postCreateDate1, publishDate1, postCreateBy1)
+                             .And()
+                             .WithPost(postId2, postTitle2, "desc2", new[] { 1 }, "secondUrlT", "secondUrl", postCreateDate2, postCreateDate2, null, postCreateBy2);
+
+            //ACT
+            var posts = await _sandbox.Mediator.Send(new GetMyPostOverview(postCreateBy1, "Overview2", FilterPostStatus.AllState, OrderPostDate.RecentlyCreate, 5));
+
+            //ASSERT
+            var firstPost = posts.Single(p => p.Id == postId1);
+
+            firstPost.Id.Should().Be(postId1);
+            firstPost.Title.Should().Be(postTitle1);
+            firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
+            firstPost.CreateDate.Should().Be(postCreateDate1);
         }
 
         public void Dispose()

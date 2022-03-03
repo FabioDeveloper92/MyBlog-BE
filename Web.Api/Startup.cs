@@ -85,15 +85,6 @@ namespace Web.Api
             services.AddScoped<ApiExceptionFilter>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            //services.AddAuthentication(options =>
-            // {
-            //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            // }).AddJwtBearer();
-
-            //// This is the tricky part to inject the configuration so the public key is ued to validate the JWT
-            //services.AddTransient<IConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
-
             MongoDBInstallmentMap.Map();
         }
 
