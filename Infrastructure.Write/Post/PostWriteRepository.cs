@@ -33,7 +33,7 @@ namespace Infrastructure.Write.Post
             if (postWriteDto == null)
                 return null;
 
-            return Domain.Post.Create(postWriteDto.Title, postWriteDto.ImageThumb, postWriteDto.ImageMain, postWriteDto.Text, postWriteDto.Tags, postWriteDto.CreateBy, postWriteDto.CreateDate, postWriteDto.UpdateDate, postWriteDto.PublishDate);
+            return Domain.Post.Create(postWriteDto.Title, postWriteDto.ImageThumb, postWriteDto.ImageMain, postWriteDto.Text, postWriteDto.Tags, postWriteDto.CreateBy, postWriteDto.CreateDate, postWriteDto.UpdateDate, postWriteDto.PublishDate, postWriteDto.Comments);
         }
 
         public async Task Add(Domain.Post entity, CancellationToken cancellationToken = default(CancellationToken))

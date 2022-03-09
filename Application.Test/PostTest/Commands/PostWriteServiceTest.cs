@@ -231,16 +231,58 @@ namespace Application.Test.PostTest.Commands
         }
 
         [Fact]
-        public void update_post_not_exist_should_exception()
+        public async void add_comment_post()
+        {
+            //ARRANGE
+            var postId = Guid.NewGuid();
+
+            _sandbox.Scenario.WithPost(postId);
+
+            //ACT 
+            await _sandbox.Mediator.Send(new AddPostComment(Guid.NewGuid(), postId, "Wow, it's wondeful", "admin@test.it", DateTime.Now));
+        }
+
+        [Fact]
+        public void add_comment_post_not_exist_should_exception()
         {
             //ARRANGE
             _sandbox.Scenario.WithPost();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new UpdatePost(Guid.NewGuid(), "a", "a", "a", "b", new int[] { 0 }, "b", DateTime.Now, DateTime.Now)); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new AddPostComment(Guid.NewGuid(), Guid.NewGuid(), "Wow, it's wondeful", "admin" ,DateTime.Now)); };
 
             //ASSERT
             fn.Should().Throw<PostNotFoundException>();
+        }
+
+        [Fact]
+        public void add_comment_without_username_should_exception()
+        {
+            //ARRANGE
+            var postId = Guid.NewGuid();
+
+            _sandbox.Scenario.WithPost(postId);
+
+            //ACT 
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new AddPostComment(Guid.NewGuid(), postId, "Wow, it's wondeful", "", DateTime.Now)); };
+
+            //ASSERT
+            fn.Should().Throw<EmptyFieldException>();
+        }
+
+        [Fact]
+        public void add_comment_without_text_should_exception()
+        {
+            //ARRANGE
+            var postId = Guid.NewGuid();
+
+            _sandbox.Scenario.WithPost(postId);
+
+            //ACT 
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new AddPostComment(Guid.NewGuid(), postId, "", "admin@test.it", DateTime.Now)); };
+
+            //ASSERT
+            fn.Should().Throw<EmptyFieldException>();
         }
 
         public void Dispose()

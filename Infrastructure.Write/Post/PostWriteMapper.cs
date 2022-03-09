@@ -9,7 +9,7 @@
     {
         public PostWriteDto ToPostDto(Domain.Post item)
         {
-            var dto = new PostWriteDto(item.Id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.CreateBy, item.CreateDate, item.UpdateDate, item.PublishDate);
+            var dto = new PostWriteDto(item.Id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.CreateBy, item.CreateDate, item.UpdateDate, item.PublishDate, item.Comments);
 
             return dto;
         }

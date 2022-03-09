@@ -1,5 +1,7 @@
-﻿using Infrastructure.Core;
+﻿using Domain;
+using Infrastructure.Core;
 using System;
+using System.Collections.Generic;
 
 namespace Infrastructure.Write.Post
 {
@@ -14,8 +16,9 @@ namespace Infrastructure.Write.Post
         public DateTime CreateDate { get; }
         public DateTime UpdateDate { get; }
         public DateTime? PublishDate { get; }
+        public List<PostComment> Comments { get; }
 
-        public PostWriteDto(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate) : base(id)
+        public PostWriteDto(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostComment> comments) : base(id)
         {
             Title = title;
             ImageThumb = imageThumb;
@@ -26,6 +29,7 @@ namespace Infrastructure.Write.Post
             CreateDate = createDate;
             UpdateDate = updateDate;
             PublishDate = publishDate;
+            Comments = comments;
         }
     }
 }

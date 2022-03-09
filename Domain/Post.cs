@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Domain.Core;
 using Domain.Exceptions;
@@ -17,8 +18,9 @@ namespace Domain
         public DateTime CreateDate { get; private set; }
         public DateTime UpdateDate { get; private set; }
         public DateTime? PublishDate { get; private set; }
+        public List<PostComment> Comments { get; private set; }
 
-        private Post(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate) : base(id)
+        private Post(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostComment> comments) : base(id)
         {
             Title = title;
             ImageThumb = imageThumb;
@@ -29,14 +31,15 @@ namespace Domain
             CreateDate = createDate;
             UpdateDate = updateDate;
             PublishDate = publishDate;
+            Comments = comments ?? new List<PostComment>();
         }
 
-        public static Post Create(string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, Guid? postId = null)
+        public static Post Create(string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostComment> comments, Guid? postId = null)
         {
             if (postId == null)
                 postId = Guid.NewGuid();
 
-            var item = new Post(postId.Value, title, imageThumb, imageMain, text, tags, createBy, createDate, updateDate, publishDate);
+            var item = new Post(postId.Value, title, imageThumb, imageMain, text, tags, createBy, createDate, updateDate, publishDate, comments);
 
             item.Validate();
 
@@ -91,6 +94,13 @@ namespace Domain
             Validate();
         }
 
+        public void AddComments(string username, string text, DateTime createDate, Guid id)
+        {
+            var comment = PostComment.Create(username, text, createDate, id);
+            Comments.Add(comment);
+
+            Validate();
+        }
         protected override void Validate()
         {
             if (string.IsNullOrEmpty(Title))

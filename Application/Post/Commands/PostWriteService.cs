@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace Application.Post.Commands
 {
     public class PostWriteService : IRequestHandler<CreatePost>,
-                                    IRequestHandler<UpdatePost>
+                                    IRequestHandler<UpdatePost>,
+                                    IRequestHandler<AddPostComment>
     {
         private readonly IPostWriteRepository _postWriteRepository;
 
@@ -18,7 +19,7 @@ namespace Application.Post.Commands
 
         public async Task<Unit> Handle(CreatePost command, CancellationToken cancellationToken)
         {
-            var entity = Domain.Post.Create(command.Title, command.ImageThumb, command.ImageMain, command.Text, command.Tags, command.CreateBy, command.CreateDate, command.UpdateDate, command.PublishDate, command.Id);
+            var entity = Domain.Post.Create(command.Title, command.ImageThumb, command.ImageMain, command.Text, command.Tags, command.CreateBy, command.CreateDate, command.UpdateDate, command.PublishDate, null, command.Id);
 
             await _postWriteRepository.Add(entity);
 
@@ -39,6 +40,20 @@ namespace Application.Post.Commands
             entity.SetCreateBy(command.CreateBy);
             entity.SetUpdateDate(command.UpdateDate);
             entity.SetPublishDate(command.PublishDate);
+
+            await _postWriteRepository.Update(entity);
+
+            return Unit.Value;
+        }
+
+        public async Task<Unit> Handle(AddPostComment command, CancellationToken cancellationToken)
+        {
+            var entity = await _postWriteRepository.SingleOrDefault(command.PostId);
+
+            if (entity == null)
+                throw new PostNotFoundException();
+
+            entity.AddComments(command.Username, command.Text, command.CreateDate, command.Id);
 
             await _postWriteRepository.Update(entity);
 

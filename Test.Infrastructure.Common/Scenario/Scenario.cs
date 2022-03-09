@@ -33,6 +33,27 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
+        public Scenario WithPost(Guid postId)
+        {
+            var createTask = new CreatePostBuilder()
+                .WithId(postId)
+                .WithTitle("Default Name")
+                .WithText("Default Description")
+                .WithTags(new[] { 1 })
+                .WithImageMain("imgMainUrl")
+                .WithImageThumb("imgThumbUrl")
+                .WithCreateDate(DateTime.Now)
+                .WithUpdateDate(DateTime.Now)
+                .WithPublishDate(null)
+                .WithCreateBy("Fabio")
+                .Build();
+
+            _mediator.Send(createTask).Wait();
+
+            return this;
+        }
+
+
         public Scenario WithPost(Guid id, string title, string text, int[] tags, string imageMain, string imageThumb, DateTime createDate, DateTime updateDate, DateTime? publishDate, string createBy)
         {
             var createTask = new CreatePostBuilder()
