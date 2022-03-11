@@ -24,6 +24,8 @@ namespace Infrastructure.Write.Post
                 map.MapMember(x => x.CreateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Utc));
                 map.MapMember(x => x.UpdateDate).SetIsRequired(true).SetSerializer(new DateTimeSerializer(DateTimeKind.Utc));
                 map.MapMember(x => x.PublishDate).SetIsRequired(false);
+
+                map.MapMember(x => x.Comments).SetElementName("Comments");
             });
         }
     }

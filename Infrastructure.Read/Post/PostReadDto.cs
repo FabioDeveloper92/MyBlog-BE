@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Core;
 using System;
+using System.Collections.Generic;
 
 namespace Infrastructure.Read.Post
 {
@@ -11,8 +12,9 @@ namespace Infrastructure.Read.Post
         public int[] Tags { get; }
         public string CreateBy { get; }
         public DateTime? PublishDate { get; }
-        
-        public PostReadDto(Guid id, string title, string text, string imageMain, int[] tags, string createBy, DateTime? publishDate) : base(id)
+        public List<PostCommentReadDto> Comments { get; }
+
+        public PostReadDto(Guid id, string title, string text, string imageMain, int[] tags, string createBy, DateTime? publishDate, List<PostCommentReadDto> comments) : base(id)
         {
             Title = title;
             Text = text;
@@ -20,6 +22,7 @@ namespace Infrastructure.Read.Post
             Tags = tags;
             CreateBy = createBy;
             PublishDate = publishDate;
+            Comments = comments;
         }
 
     }

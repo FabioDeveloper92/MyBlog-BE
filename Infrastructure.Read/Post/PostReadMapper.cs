@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Infrastructure.Read.Post
@@ -35,11 +36,14 @@ namespace Infrastructure.Read.Post
         public DateTime UpdateDate { get; set; }
 
         [DataMember]
-        public DateTime? PublishDate { get; set; }
+        public DateTime? PublishDate { get; set; } 
+        
+        [DataMember]
+        public List<PostCommentReadDto> Comments { get; set; }
 
         public PostReadDto toPostReadDto()
         {
-            return new PostReadDto(Id, Title, Text, ImageMain, Tags, CreateBy, PublishDate);
+            return new PostReadDto(Id, Title, Text, ImageMain, Tags, CreateBy, PublishDate, Comments);
         }
     }
 }

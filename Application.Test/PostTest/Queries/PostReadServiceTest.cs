@@ -63,6 +63,7 @@ namespace Application.Test.PostTest.Queries
             post.PublishDate.Should().NotBeNull().And.Be(publishDate);
             post.CreateBy.Should().Be(postCreateBy);
             post.Tags.Should().NotBeEmpty().And.HaveCount(postCategories.Length).And.Contain(postCategories);
+            post.Comments.Should().BeEmpty();
         }
 
         [Fact]
@@ -271,7 +272,7 @@ namespace Application.Test.PostTest.Queries
             secondPost.CreateBy.Should().Be(postCreateBy2);
             secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories2.Length).And.Contain(postCategories2);
         }
-       
+
         [Fact]
         public async Task get_post_update_with_id_return_one_post()
         {
@@ -304,7 +305,7 @@ namespace Application.Test.PostTest.Queries
             post.CreateBy.Should().Be(postCreateBy);
             post.Tags.Should().NotBeEmpty().And.HaveCount(postCategories.Length).And.Contain(postCategories);
         }
-        
+
         [Fact]
         public async Task get_my_post_overview_return_two_post()
         {
@@ -374,6 +375,99 @@ namespace Application.Test.PostTest.Queries
             firstPost.Title.Should().Be(postTitle1);
             firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
             firstPost.CreateDate.Should().Be(postCreateDate1);
+        }
+
+        [Fact]
+        public async Task get_my_post_with_one_comment()
+        {
+            var postId = Guid.NewGuid();
+            const string postTitle = "My First Post";
+            const string postText = "This is an example";
+            var postCategories = new int[1] { 0 };
+            const string postImageUrl = "myUrl";
+            const string postImageThumbUrl = "myUrl2";
+            var d = new DateTime(2021, 8, 16);
+            var postCreateDate = DateTime.SpecifyKind(d, DateTimeKind.Utc);
+            var publishDate = DateTime.SpecifyKind(new DateTime(2021, 11, 27), DateTimeKind.Utc);
+            const string postCreateBy = "Admin";
+
+            var postCommentId = Guid.NewGuid();
+            var comment = "hey, how are you";
+            var commentUsername = "billy";
+            var postCommentDate = DateTime.SpecifyKind(d.AddHours(1), DateTimeKind.Utc);
+
+            _sandbox.Scenario.WithPost(postId, postTitle, postText, postCategories, postImageUrl, postImageThumbUrl, postCreateDate, postCreateDate, publishDate, postCreateBy)
+                             .WithPostComment(postCommentId, postId, comment, commentUsername, postCommentDate);
+
+            //ACT
+            var post = await _sandbox.Mediator.Send(new GetPost(postId));
+
+            //ASSERT
+            post.Id.Should().Be(postId);
+            post.Title.Should().Be(postTitle);
+            post.Text.Should().Be(postText);
+            post.ImageMain.Should().Be(postImageUrl);
+            post.PublishDate.Should().NotBeNull().And.Be(publishDate);
+            post.CreateBy.Should().Be(postCreateBy);
+            post.Tags.Should().NotBeEmpty().And.HaveCount(postCategories.Length).And.Contain(postCategories);
+
+            post.Comments.Count().Should().Be(1);
+            var firstComment = post.Comments.Single(p => p.Id == postCommentId);
+            firstComment.Username.Should().Be(commentUsername);
+            firstComment.Text.Should().Be(comment);
+            firstComment.CreateDate.Should().Be(postCommentDate);
+        }
+
+        [Fact]
+        public async Task get_my_post_with_two_comment()
+        {
+            var postId = Guid.NewGuid();
+            const string postTitle = "My First Post";
+            const string postText = "This is an example";
+            var postCategories = new int[1] { 0 };
+            const string postImageUrl = "myUrl";
+            const string postImageThumbUrl = "myUrl2";
+            var d = new DateTime(2021, 8, 16);
+            var postCreateDate = DateTime.SpecifyKind(d, DateTimeKind.Utc);
+            var publishDate = DateTime.SpecifyKind(new DateTime(2021, 11, 27), DateTimeKind.Utc);
+            const string postCreateBy = "Admin";
+
+            var postCommentId = Guid.NewGuid();
+            var comment = "hey, how are you";
+            var commentUsername = "billy";
+            var postCommentDate = DateTime.SpecifyKind(d.AddHours(1), DateTimeKind.Utc);
+
+            var postCommentId2 = Guid.NewGuid();
+            var comment2 = "sorry for the delay";
+            var commentUsername2 = "jake";
+            var postCommentDate2 = DateTime.SpecifyKind(d.AddDays(1), DateTimeKind.Utc);
+
+            _sandbox.Scenario.WithPost(postId, postTitle, postText, postCategories, postImageUrl, postImageThumbUrl, postCreateDate, postCreateDate, publishDate, postCreateBy)
+                             .WithPostComment(postCommentId, postId, comment, commentUsername, postCommentDate)
+                             .WithPostComment(postCommentId2, postId, comment2, commentUsername2, postCommentDate2);
+
+            //ACT
+            var post = await _sandbox.Mediator.Send(new GetPost(postId));
+
+            //ASSERT
+            post.Id.Should().Be(postId);
+            post.Title.Should().Be(postTitle);
+            post.Text.Should().Be(postText);
+            post.ImageMain.Should().Be(postImageUrl);
+            post.PublishDate.Should().NotBeNull().And.Be(publishDate);
+            post.CreateBy.Should().Be(postCreateBy);
+            post.Tags.Should().NotBeEmpty().And.HaveCount(postCategories.Length).And.Contain(postCategories);
+
+            post.Comments.Count().Should().Be(2);
+            var firstComment = post.Comments.Single(p => p.Id == postCommentId);
+            firstComment.Username.Should().Be(commentUsername);
+            firstComment.Text.Should().Be(comment);
+            firstComment.CreateDate.Should().Be(postCommentDate);
+
+            var secondComment = post.Comments.Single(p => p.Id == postCommentId2);
+            secondComment.Username.Should().Be(commentUsername2);
+            secondComment.Text.Should().Be(comment2);
+            secondComment.CreateDate.Should().Be(postCommentDate2);
         }
 
         public void Dispose()

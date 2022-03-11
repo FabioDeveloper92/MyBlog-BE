@@ -38,7 +38,8 @@ namespace Infrastructure.Read.Post
                                                      .Include("ImageMain")
                                                      .Include("Tags")
                                                      .Include("CreateBy")
-                                                     .Include("PublishDate");
+                                                     .Include("PublishDate")
+                                                     .Include("Comments");
 
             return await _dbContext.Find(filterId & !filterPublishDate).Project<PostReadDto>(projection).FirstOrDefaultAsync();
         }
@@ -53,7 +54,8 @@ namespace Infrastructure.Read.Post
                                                      .Include("ImageMain")
                                                      .Include("Tags")
                                                      .Include("CreateBy")
-                                                     .Include("PublishDate");
+                                                     .Include("PublishDate")
+                                                     .Include("Comments");
 
             return await _dbContext.Find(!filterPublishDateIsNull).Project<PostReadDto>(projection).ToListAsync();
         }

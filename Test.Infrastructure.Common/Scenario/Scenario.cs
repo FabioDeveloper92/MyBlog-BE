@@ -56,7 +56,7 @@ namespace Test.Infrastructure.Common.Scenario
 
         public Scenario WithPost(Guid id, string title, string text, int[] tags, string imageMain, string imageThumb, DateTime createDate, DateTime updateDate, DateTime? publishDate, string createBy)
         {
-            var createTask = new CreatePostBuilder()
+            var createPost = new CreatePostBuilder()
                .WithId(id)
                .WithTitle(title)
                .WithText(text)
@@ -69,7 +69,22 @@ namespace Test.Infrastructure.Common.Scenario
                .WithCreateBy(createBy)
                .Build();
 
-            _mediator.Send(createTask).Wait();
+            _mediator.Send(createPost).Wait();
+
+            return this;
+        }
+
+        public Scenario WithPostComment(Guid postCommentId, Guid postId, string text, string username, DateTime createDate)
+        {
+            var createPostComment = new CreatePostCommentBuilder()
+                .WithPostCommentId(postCommentId)
+                .WithPostId(postId)
+                .WithText(text)
+                .WithUsername(username)
+                .WithCreateDate(createDate)
+                .Build();
+
+            _mediator.Send(createPostComment).Wait();
 
             return this;
         }

@@ -1,6 +1,9 @@
-﻿using Infrastructure.Core;
+﻿using Domain;
+using Infrastructure.Core;
 using MongoDB.Driver;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,9 +11,9 @@ namespace Infrastructure.Write.Post
 {
     public interface IPostWriteRepository
     {
-       Task<Domain.Post> SingleOrDefault(Guid id, CancellationToken cancellationToken = default(CancellationToken));
-       Task Add(Domain.Post entity, CancellationToken cancellationToken = default(CancellationToken));
-       Task Update(Domain.Post entity, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Domain.Post> SingleOrDefault(Guid id, CancellationToken cancellationToken = default(CancellationToken));
+        Task Add(Domain.Post entity, CancellationToken cancellationToken = default(CancellationToken));
+        Task Update(Domain.Post entity, CancellationToken cancellationToken = default(CancellationToken));
     }
 
     public class PostWriteRepository : IPostWriteRepository
@@ -33,7 +36,9 @@ namespace Infrastructure.Write.Post
             if (postWriteDto == null)
                 return null;
 
-            return Domain.Post.Create(postWriteDto.Title, postWriteDto.ImageThumb, postWriteDto.ImageMain, postWriteDto.Text, postWriteDto.Tags, postWriteDto.CreateBy, postWriteDto.CreateDate, postWriteDto.UpdateDate, postWriteDto.PublishDate, postWriteDto.Comments);
+            var comments = postWriteDto.Comments.Select(c => Domain.PostComment.Create(c.Username, c.Text, c.CreateDate, c.Id)).ToList();
+
+            return Domain.Post.Create(postWriteDto.Title, postWriteDto.ImageThumb, postWriteDto.ImageMain, postWriteDto.Text, postWriteDto.Tags, postWriteDto.CreateBy, postWriteDto.CreateDate, postWriteDto.UpdateDate, postWriteDto.PublishDate, comments, postWriteDto.Id);
         }
 
         public async Task Add(Domain.Post entity, CancellationToken cancellationToken = default(CancellationToken))
@@ -50,13 +55,16 @@ namespace Infrastructure.Write.Post
             cancellationToken.ThrowIfCancellationRequested();
 
             var filter = Builders<PostWriteDto>.Filter.Eq("_id", postDto.Id);
+
             var update = Builders<PostWriteDto>.Update.Set("Title", postDto.Title)
                                                       .Set("Text", postDto.Text)
                                                       .Set("ImageMain", postDto.ImageMain)
                                                       .Set("ImageThumb", postDto.ImageThumb)
                                                       .Set("Tags", postDto.Tags)
                                                       .Set("UpdateDate", postDto.UpdateDate)
-                                                      .Set("PublishDate", postDto.PublishDate);
+                                                      .Set("PublishDate", postDto.PublishDate)
+                                                      .Set("Comments", postDto.Comments);
+
 
             await _dbContext.UpdateOneAsync(filter, update);
         }
