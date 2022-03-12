@@ -71,7 +71,7 @@ namespace Application.Post.Commands
             if (entity == null)
                 throw new PostNotFoundException();
 
-            entity.AddPostRelated(command.PostId);
+            entity.AddPostRelated(command.PostRelatedId);
 
             await _postWriteRepository.Update(entity);
 

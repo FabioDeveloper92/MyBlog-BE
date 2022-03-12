@@ -294,7 +294,7 @@ namespace Application.Test.PostTest.Commands
             _sandbox.Scenario.WithPost(postId);
 
             //ACT 
-            await _sandbox.Mediator.Send(new AddPostRelated(Guid.NewGuid()));
+            await _sandbox.Mediator.Send(new AddPostRelated(Guid.NewGuid(), postId));
         }
 
         public void Dispose()
