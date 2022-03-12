@@ -25,9 +25,9 @@ namespace Web.Api.Controllers.Blog
         }
 
         [HttpGet("{id}")]
-        public async Task<PostReadDto> Get(Guid id)
+        public async Task<PostPublishedReadDto> Get(Guid id)
         {
-            return await _mediator.Send(new GetPost(id));
+            return await _mediator.Send(new GetPostPublished(id));
         }
 
     }

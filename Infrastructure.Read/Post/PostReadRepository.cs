@@ -11,7 +11,7 @@ namespace Infrastructure.Read.Post
 {
     public interface IPostReadRepository
     {
-        Task<PostReadDto> SingleOrDefault(Guid id);
+        Task<PostPublishedReadDto> GetPostPublished(Guid id);
         Task<List<PostReadDto>> GetAll();
         Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems);
         Task<PostUpdateReadDto> GetPostAllFields(Guid id);
@@ -27,22 +27,28 @@ namespace Infrastructure.Read.Post
             _dbContext = mongoDbConnectionFactory.Connection.GetCollection<PostReadMapper>(PostsCollection);
         }
 
-        public async Task<PostReadDto> SingleOrDefault(Guid id)
+        public async Task<PostPublishedReadDto> GetPostPublished(Guid id)
         {
             var filterId = Builders<PostReadMapper>.Filter.Eq("_id", id);
             var filterPublishDate = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
 
-            var projection = Builders<PostReadMapper>.Projection
-                                                     .Include("Title")
-                                                     .Include("Text")
-                                                     .Include("ImageMain")
-                                                     .Include("Tags")
-                                                     .Include("CreateBy")
-                                                     .Include("PublishDate")
-                                                     .Include("Comments")
-                                                     .Include("PostsRelated");
+            var projection = Builders<BsonDocument>.Projection
+                                                   .Include("Title")
+                                                   .Include("Text")
+                                                   .Include("ImageMain")
+                                                   .Include("Tags")
+                                                   .Include("CreateBy")
+                                                   .Include("PublishDate")
+                                                   .Include("Comments")
+                                                   .Include("PostsRelatedCompleted._id")
+                                                   .Include("PostsRelatedCompleted.Title")
+                                                   .Include("PostsRelatedCompleted.ImageThumb");
 
-            return await _dbContext.Find(filterId & !filterPublishDate).Project<PostReadDto>(projection).FirstOrDefaultAsync();
+            return await _dbContext.Aggregate()
+                                    .Match(filterId & !filterPublishDate)
+                                    .Lookup(PostsCollection, "PostsRelated", "_id", "PostsRelatedCompleted")
+                                    .Project<PostPublishedReadDto>(projection)
+                                    .FirstOrDefaultAsync();
         }
 
         public async Task<List<PostReadDto>> GetAll()

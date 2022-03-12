@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Post.Queries
 {
-    public class PostReadService : IRequestHandler<GetPost, PostReadDto>,
+    public class PostReadService : IRequestHandler<GetPostPublished, PostPublishedReadDto>,
                                    IRequestHandler<GetPosts, List<PostReadDto>>,
                                    IRequestHandler<GetPostsOverview, List<PostOverviewReadDto>>,
                                    IRequestHandler<GetPostUpdate, PostUpdateReadDto>,
@@ -20,9 +20,10 @@ namespace Application.Post.Queries
         {
             _postReadRepository = postReadRepository;
         }
-        public async Task<PostReadDto> Handle(GetPost request, CancellationToken cancellationToken)
+
+        public async Task<PostPublishedReadDto> Handle(GetPostPublished request, CancellationToken cancellationToken)
         {
-            var post = await _postReadRepository.SingleOrDefault(request.Id);
+            var post = await _postReadRepository.GetPostPublished(request.Id);
 
             if (post == null)
                 throw new PostNotFoundException();

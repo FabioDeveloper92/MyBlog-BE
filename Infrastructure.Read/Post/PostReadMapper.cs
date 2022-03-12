@@ -40,12 +40,8 @@ namespace Infrastructure.Read.Post
         
         [DataMember]
         public List<PostCommentReadDto> Comments { get; set; }   
+
         [DataMember]
         public List<Guid> PostsRelated { get; set; }
-
-        public PostReadDto toPostReadDto()
-        {
-            return new PostReadDto(Id, Title, Text, ImageMain, Tags, CreateBy, PublishDate, Comments, PostsRelated);
-        }
     }
 }

@@ -54,6 +54,25 @@ namespace Test.Infrastructure.Common.Scenario
             return this;
         }
 
+        public Scenario WithPostToBeRelated(Guid postRelatedId, string postRelatedTitle, string postRelatedImageThumb)
+        {
+            var createTask = new CreatePostBuilder()
+                .WithId(postRelatedId)
+                .WithTitle(postRelatedTitle)
+                .WithText("Default Description")
+                .WithTags(new[] { 1 })
+                .WithImageMain("imgMainUrl")
+                .WithImageThumb(postRelatedImageThumb)
+                .WithCreateDate(DateTime.Now)
+                .WithUpdateDate(DateTime.Now)
+                .WithPublishDate(null)
+                .WithCreateBy("Fabio")
+                .Build();
+
+            _mediator.Send(createTask).Wait();
+
+            return this;
+        }
 
         public Scenario WithPost(Guid id, string title, string text, int[] tags, string imageMain, string imageThumb, DateTime createDate, DateTime updateDate, DateTime? publishDate, string createBy, List<Guid> postsRelated)
         {
@@ -137,6 +156,5 @@ namespace Test.Infrastructure.Common.Scenario
         {
             return this;
         }
-
     }
 }

@@ -290,11 +290,13 @@ namespace Application.Test.PostTest.Commands
         {
             //ARRANGE
             var postId = Guid.NewGuid();
+            var postIdRelated = Guid.NewGuid();
 
-            _sandbox.Scenario.WithPost(postId);
+            _sandbox.Scenario.WithPost(postId)
+                             .WithPost(postIdRelated);
 
             //ACT 
-            await _sandbox.Mediator.Send(new AddPostRelated(Guid.NewGuid(), postId));
+            await _sandbox.Mediator.Send(new AddPostRelated(postIdRelated, postId));
         }
 
         public void Dispose()

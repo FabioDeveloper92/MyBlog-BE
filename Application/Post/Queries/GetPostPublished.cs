@@ -4,11 +4,11 @@ using System;
 
 namespace Application.Post.Queries
 {
-    public class GetPost : IQuery<PostReadDto>
+    public class GetPostPublished : IQuery<PostPublishedReadDto>
     {
         public Guid Id { get; }
 
-        public GetPost(Guid id)
+        public GetPostPublished(Guid id)
         {
             Id = id;
         }

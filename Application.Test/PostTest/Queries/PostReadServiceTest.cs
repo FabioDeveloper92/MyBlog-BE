@@ -54,7 +54,7 @@ namespace Application.Test.PostTest.Queries
             _sandbox.Scenario.WithPost(postId, postTitle, postText, postCategories, postImageUrl, postImageThumbUrl, postCreateDate, postCreateDate, publishDate, postCreateBy, null);
 
             //ACT
-            var post = await _sandbox.Mediator.Send(new GetPost(postId));
+            var post = await _sandbox.Mediator.Send(new GetPostPublished(postId));
 
             //ASSERT
             post.Id.Should().Be(postId);
@@ -65,7 +65,7 @@ namespace Application.Test.PostTest.Queries
             post.CreateBy.Should().Be(postCreateBy);
             post.Tags.Should().NotBeEmpty().And.HaveCount(postCategories.Length).And.Contain(postCategories);
             post.Comments.Should().BeEmpty();
-            post.PostsRelated.Should().BeEmpty();
+            post.PostsRelatedCompleted.Should().BeEmpty();
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace Application.Test.PostTest.Queries
                        .And().WithPost();
 
             //ACT
-            var post = await _sandbox.Mediator.Send(new GetPost(postId));
+            var post = await _sandbox.Mediator.Send(new GetPostPublished(postId));
 
             //ASSERT
             post.Id.Should().Be(postId);
@@ -109,7 +109,7 @@ namespace Application.Test.PostTest.Queries
             _sandbox.Scenario.WithPost().And().WithPost();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new GetPost(postId)); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new GetPostPublished(postId)); };
 
             //ASSERT
             fn.Should().Throw<PostNotFoundException>();
@@ -402,7 +402,7 @@ namespace Application.Test.PostTest.Queries
                              .WithPostComment(postCommentId, postId, comment, commentUsername, postCommentDate);
 
             //ACT
-            var post = await _sandbox.Mediator.Send(new GetPost(postId));
+            var post = await _sandbox.Mediator.Send(new GetPostPublished(postId));
 
             //ASSERT
             post.Id.Should().Be(postId);
@@ -449,7 +449,7 @@ namespace Application.Test.PostTest.Queries
                              .WithPostComment(postCommentId2, postId, comment2, commentUsername2, postCommentDate2);
 
             //ACT
-            var post = await _sandbox.Mediator.Send(new GetPost(postId));
+            var post = await _sandbox.Mediator.Send(new GetPostPublished(postId));
 
             //ASSERT
             post.Id.Should().Be(postId);
@@ -492,13 +492,16 @@ namespace Application.Test.PostTest.Queries
             var postCommentDate = DateTime.SpecifyKind(d.AddHours(1), DateTimeKind.Utc);
 
             var postRelatedId = Guid.NewGuid();
+            var postRelatedTitle = "Related";
+            var postRelatedImageThumb = "UrlRelated";
             var postRelatedIds = new List<Guid>() { postRelatedId };
 
-            _sandbox.Scenario.WithPost(postId, postTitle, postText, postCategories, postImageUrl, postImageThumbUrl, postCreateDate, postCreateDate, publishDate, postCreateBy, postRelatedIds)
+            _sandbox.Scenario.WithPostToBeRelated(postRelatedId, postRelatedTitle, postRelatedImageThumb)
+                             .WithPost(postId, postTitle, postText, postCategories, postImageUrl, postImageThumbUrl, postCreateDate, postCreateDate, publishDate, postCreateBy, postRelatedIds)
                              .WithPostComment(postCommentId, postId, comment, commentUsername, postCommentDate);
 
             //ACT
-            var post = await _sandbox.Mediator.Send(new GetPost(postId));
+            var post = await _sandbox.Mediator.Send(new GetPostPublished(postId));
 
             //ASSERT
             post.Id.Should().Be(postId);
@@ -515,8 +518,10 @@ namespace Application.Test.PostTest.Queries
             firstComment.Text.Should().Be(comment);
             firstComment.CreateDate.Should().Be(postCommentDate);
 
-            post.PostsRelated.Count().Should().Be(1);
-            post.PostsRelated.Should().Contain(postRelatedIds);
+            post.PostsRelatedCompleted.Count().Should().Be(1);
+            var postRelated = post.PostsRelatedCompleted.Single(x => x.Id == postRelatedId);
+            postRelated.Title.Should().Be(postRelatedTitle);
+            postRelated.ImageThumb.Should().Be(postRelatedImageThumb);
         }
 
         public void Dispose()
