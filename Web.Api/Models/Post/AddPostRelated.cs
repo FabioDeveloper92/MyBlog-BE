@@ -2,9 +2,9 @@
 
 namespace Web.Api.Models.Post
 {
-    public class NewPostComment
+    public class AddPostRelated
     {
+        public Guid PostRelatedId { get; set; }
         public Guid PostId { get; set; }
-        public string Text { get; set; }
     }
 }

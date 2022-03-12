@@ -39,7 +39,8 @@ namespace Infrastructure.Read.Post
                                                      .Include("Tags")
                                                      .Include("CreateBy")
                                                      .Include("PublishDate")
-                                                     .Include("Comments");
+                                                     .Include("Comments")
+                                                     .Include("PostsRelated");
 
             return await _dbContext.Find(filterId & !filterPublishDate).Project<PostReadDto>(projection).FirstOrDefaultAsync();
         }
@@ -55,7 +56,8 @@ namespace Infrastructure.Read.Post
                                                      .Include("Tags")
                                                      .Include("CreateBy")
                                                      .Include("PublishDate")
-                                                     .Include("Comments");
+                                                     .Include("Comments")
+                                                     .Include("PostsRelated");
 
             return await _dbContext.Find(!filterPublishDateIsNull).Project<PostReadDto>(projection).ToListAsync();
         }

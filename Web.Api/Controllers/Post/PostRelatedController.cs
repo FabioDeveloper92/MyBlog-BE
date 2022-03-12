@@ -1,17 +1,11 @@
-﻿using Application.Post.Commands;
-using Application.Post.Queries;
-using Infrastructure.Read.Post;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Web.Api.Models.Post;
 
 namespace Web.Api.Controllers.Blog
 {
     [Route("api/[controller]")]
-    public class PostRelatedController 
+    public class PostRelatedController
     {
         private readonly IMediator _mediator;
 
@@ -21,9 +15,9 @@ namespace Web.Api.Controllers.Blog
         }
 
         [HttpPost]
-        public async Task Post([FromBody] AddPostRelated item)
+        public async Task Post([FromBody] Models.Post.AddPostRelated item)
         {
-            await _mediator.Send(new AddPostRelated(item.PostId));
+            await _mediator.Send(new Application.Post.Commands.AddPostRelated(item.PostRelatedId, item.PostId));
         }
     }
 }

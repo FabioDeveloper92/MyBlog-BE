@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MediatR;
 using Test.Common.Builders.Commands;
 
@@ -54,7 +55,7 @@ namespace Test.Infrastructure.Common.Scenario
         }
 
 
-        public Scenario WithPost(Guid id, string title, string text, int[] tags, string imageMain, string imageThumb, DateTime createDate, DateTime updateDate, DateTime? publishDate, string createBy)
+        public Scenario WithPost(Guid id, string title, string text, int[] tags, string imageMain, string imageThumb, DateTime createDate, DateTime updateDate, DateTime? publishDate, string createBy, List<Guid> postsRelated)
         {
             var createPost = new CreatePostBuilder()
                .WithId(id)
@@ -67,6 +68,7 @@ namespace Test.Infrastructure.Common.Scenario
                .WithUpdateDate(updateDate)
                .WithPublishDate(publishDate)
                .WithCreateBy(createBy)
+               .WithPostRelated(postsRelated)
                .Build();
 
             _mediator.Send(createPost).Wait();

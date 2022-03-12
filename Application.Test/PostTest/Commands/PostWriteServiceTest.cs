@@ -224,7 +224,7 @@ namespace Application.Test.PostTest.Commands
             var d = new DateTime(2021, 8, 16);
             var postCreateDate = DateTime.SpecifyKind(d, DateTimeKind.Utc);
 
-            _sandbox.Scenario.WithPost(postId, "Post", "<b>Hello</b>", new int[] { 1 }, "myUrl", "myFakeUrl", postCreateDate, postCreateDate, null, "alfa");
+            _sandbox.Scenario.WithPost(postId, "Post", "<b>Hello</b>", new int[] { 1 }, "myUrl", "myFakeUrl", postCreateDate, postCreateDate, null, "alfa", null);
 
             //ACT 
             await _sandbox.Mediator.Send(new UpdatePost(postId, "a", "a", "a", "b", new int[] { 0 }, "b", DateTime.Now, DateTime.Now));
