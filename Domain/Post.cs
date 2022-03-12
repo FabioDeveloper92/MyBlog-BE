@@ -19,8 +19,9 @@ namespace Domain
         public DateTime UpdateDate { get; private set; }
         public DateTime? PublishDate { get; private set; }
         public List<PostComment> Comments { get; private set; }
+        public List<Guid> PostsRelated { get; private set; }
 
-        private Post(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostComment> comments) : base(id)
+        private Post(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostComment> comments, List<Guid> postsRelated) : base(id)
         {
             Title = title;
             ImageThumb = imageThumb;
@@ -32,14 +33,15 @@ namespace Domain
             UpdateDate = updateDate;
             PublishDate = publishDate;
             Comments = comments ?? new List<PostComment>();
+            PostsRelated = postsRelated ?? new List<Guid>();
         }
 
-        public static Post Create(string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostComment> comments, Guid? postId = null)
+        public static Post Create(string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostComment> comments, List<Guid> postsRelated, Guid? postId = null)
         {
             if (postId == null)
                 postId = Guid.NewGuid();
 
-            var item = new Post(postId.Value, title, imageThumb, imageMain, text, tags, createBy, createDate, updateDate, publishDate, comments);
+            var item = new Post(postId.Value, title, imageThumb, imageMain, text, tags, createBy, createDate, updateDate, publishDate, comments, postsRelated);
 
             item.Validate();
 
@@ -94,10 +96,17 @@ namespace Domain
             Validate();
         }
 
-        public void AddComments(string username, string text, DateTime createDate, Guid id)
+        public void AddComment(string username, string text, DateTime createDate, Guid id)
         {
             var comment = PostComment.Create(username, text, createDate, id);
             Comments.Add(comment);
+
+            Validate();
+        } 
+        
+        public void AddPostRelated(Guid postId)
+        {
+            PostsRelated.Add(postId);
 
             Validate();
         }

@@ -249,7 +249,7 @@ namespace Application.Test.PostTest.Commands
             _sandbox.Scenario.WithPost();
 
             //ACT 
-            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new AddPostComment(Guid.NewGuid(), Guid.NewGuid(), "Wow, it's wondeful", "admin" ,DateTime.Now)); };
+            Func<Task> fn = async () => { await _sandbox.Mediator.Send(new AddPostComment(Guid.NewGuid(), Guid.NewGuid(), "Wow, it's wondeful", "admin", DateTime.Now)); };
 
             //ASSERT
             fn.Should().Throw<PostNotFoundException>();
@@ -283,6 +283,18 @@ namespace Application.Test.PostTest.Commands
 
             //ASSERT
             fn.Should().Throw<EmptyFieldException>();
+        }
+
+        [Fact]
+        public async void add_post_related()
+        {
+            //ARRANGE
+            var postId = Guid.NewGuid();
+
+            _sandbox.Scenario.WithPost(postId);
+
+            //ACT 
+            await _sandbox.Mediator.Send(new AddPostRelated(Guid.NewGuid()));
         }
 
         public void Dispose()

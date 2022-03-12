@@ -1,5 +1,6 @@
 ﻿using Application.Post.Commands;
 using System;
+using System.Collections.Generic;
 
 namespace Test.Common.Builders.Commands
 {
@@ -15,6 +16,7 @@ namespace Test.Common.Builders.Commands
         private DateTime _createDate;
         private DateTime _updateDate;
         private DateTime? _publishDate;
+        private List<Guid> _postsRelated;
 
         public CreatePostBuilder WithDefaults()
         {
@@ -91,12 +93,18 @@ namespace Test.Common.Builders.Commands
         {
             _createBy = createdBy;
             return this;
+        }    
+        
+        public CreatePostBuilder WithPostRelated(List<Guid> postsRelated)
+        {
+            _postsRelated = postsRelated;
+            return this;
         }
 
 
         public CreatePost Build()
         {
-            return new CreatePost(_id, _title, _imageThumb, _imageMain, _text, _tags, _createBy, _createDate, _updateDate, _publishDate);
+            return new CreatePost(_id, _title, _imageThumb, _imageMain, _text, _tags, _createBy, _createDate, _updateDate, _publishDate, _postsRelated);
         }
     }
 }

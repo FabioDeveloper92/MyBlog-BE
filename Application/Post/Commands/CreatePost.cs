@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace Application.Post.Commands
 {
@@ -15,8 +16,9 @@ namespace Application.Post.Commands
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public DateTime? PublishDate { get; set; }
+        public List<Guid> PostsRelated { get; set; }
 
-        public CreatePost(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate)
+        public CreatePost(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<Guid> postsRelated)
         {
             Id = id;
             Title = title;
@@ -28,6 +30,7 @@ namespace Application.Post.Commands
             CreateDate = createDate;
             UpdateDate = updateDate;
             PublishDate = publishDate;
+            PostsRelated = postsRelated;
         }
     }
 }

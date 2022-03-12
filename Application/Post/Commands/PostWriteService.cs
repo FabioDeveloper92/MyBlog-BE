@@ -8,7 +8,8 @@ namespace Application.Post.Commands
 {
     public class PostWriteService : IRequestHandler<CreatePost>,
                                     IRequestHandler<UpdatePost>,
-                                    IRequestHandler<AddPostComment>
+                                    IRequestHandler<AddPostComment>,
+                                    IRequestHandler<AddPostRelated>
     {
         private readonly IPostWriteRepository _postWriteRepository;
 
@@ -19,7 +20,7 @@ namespace Application.Post.Commands
 
         public async Task<Unit> Handle(CreatePost command, CancellationToken cancellationToken)
         {
-            var entity = Domain.Post.Create(command.Title, command.ImageThumb, command.ImageMain, command.Text, command.Tags, command.CreateBy, command.CreateDate, command.UpdateDate, command.PublishDate, null, command.Id);
+            var entity = Domain.Post.Create(command.Title, command.ImageThumb, command.ImageMain, command.Text, command.Tags, command.CreateBy, command.CreateDate, command.UpdateDate, command.PublishDate, null, command.PostsRelated, command.Id);
 
             await _postWriteRepository.Add(entity);
 
@@ -32,6 +33,9 @@ namespace Application.Post.Commands
 
             if (entity == null)
                 throw new PostNotFoundException();
+
+            if (entity.PublishDate.HasValue)
+                throw new OperationNotAvailableException();
 
             entity.SetTitle(command.Title);
             entity.SetImageThumb(command.ImageThumb);
@@ -53,7 +57,21 @@ namespace Application.Post.Commands
             if (entity == null)
                 throw new PostNotFoundException();
 
-            entity.AddComments(command.Username, command.Text, command.CreateDate, command.Id);
+            entity.AddComment(command.Username, command.Text, command.CreateDate, command.Id);
+
+            await _postWriteRepository.Update(entity);
+
+            return Unit.Value;
+        }  
+        
+        public async Task<Unit> Handle(AddPostRelated command, CancellationToken cancellationToken)
+        {
+            var entity = await _postWriteRepository.SingleOrDefault(command.PostId);
+
+            if (entity == null)
+                throw new PostNotFoundException();
+
+            entity.AddPostRelated(command.PostId);
 
             await _postWriteRepository.Update(entity);
 

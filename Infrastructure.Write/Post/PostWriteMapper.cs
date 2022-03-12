@@ -16,7 +16,7 @@ namespace Infrastructure.Write.Post
             if (item.Comments != null)
                 comments = item.Comments.Select(c => new PostCommentWriteDto() { Username = c.Username, Text = c.Text, CreateDate = c.CreateDate, Id = c.Id }).ToList();
 
-            var dto = new PostWriteDto(item.Id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.CreateBy, item.CreateDate, item.UpdateDate, item.PublishDate, comments);
+            var dto = new PostWriteDto(item.Id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, item.CreateBy, item.CreateDate, item.UpdateDate, item.PublishDate, comments, item.PostsRelated);
             return dto;
         }
     }

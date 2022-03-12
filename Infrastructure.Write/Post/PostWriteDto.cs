@@ -17,8 +17,9 @@ namespace Infrastructure.Write.Post
         public DateTime UpdateDate { get; }
         public DateTime? PublishDate { get; }
         public List<PostCommentWriteDto> Comments { get; }
+        public List<Guid> PostsRelated { get; }
 
-        public PostWriteDto(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostCommentWriteDto> comments) : base(id)
+        public PostWriteDto(Guid id, string title, string imageThumb, string imageMain, string text, int[] tags, string createBy, DateTime createDate, DateTime updateDate, DateTime? publishDate, List<PostCommentWriteDto> comments, List<Guid> postsRelated) : base(id)
         {
             Title = title;
             ImageThumb = imageThumb;
@@ -30,6 +31,7 @@ namespace Infrastructure.Write.Post
             UpdateDate = updateDate;
             PublishDate = publishDate;
             Comments = comments;
+            PostsRelated = postsRelated;
         }
     }
 }

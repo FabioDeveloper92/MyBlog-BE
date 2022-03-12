@@ -38,7 +38,7 @@ namespace Infrastructure.Write.Post
 
             var comments = postWriteDto.Comments.Select(c => Domain.PostComment.Create(c.Username, c.Text, c.CreateDate, c.Id)).ToList();
 
-            return Domain.Post.Create(postWriteDto.Title, postWriteDto.ImageThumb, postWriteDto.ImageMain, postWriteDto.Text, postWriteDto.Tags, postWriteDto.CreateBy, postWriteDto.CreateDate, postWriteDto.UpdateDate, postWriteDto.PublishDate, comments, postWriteDto.Id);
+            return Domain.Post.Create(postWriteDto.Title, postWriteDto.ImageThumb, postWriteDto.ImageMain, postWriteDto.Text, postWriteDto.Tags, postWriteDto.CreateBy, postWriteDto.CreateDate, postWriteDto.UpdateDate, postWriteDto.PublishDate, comments, postWriteDto.PostsRelated, postWriteDto.Id);
         }
 
         public async Task Add(Domain.Post entity, CancellationToken cancellationToken = default(CancellationToken))
@@ -63,7 +63,8 @@ namespace Infrastructure.Write.Post
                                                       .Set("Tags", postDto.Tags)
                                                       .Set("UpdateDate", postDto.UpdateDate)
                                                       .Set("PublishDate", postDto.PublishDate)
-                                                      .Set("Comments", postDto.Comments);
+                                                      .Set("Comments", postDto.Comments)
+                                                      .Set("PostsRelated", postDto.PostsRelated);
 
 
             await _dbContext.UpdateOneAsync(filter, update);

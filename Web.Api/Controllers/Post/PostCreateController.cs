@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Web.Api.Models.Post;
 using Application.Post.Commands;
+using System.Linq;
 
 namespace Web.Api.Controllers.Post
 {
@@ -35,7 +36,7 @@ namespace Web.Api.Controllers.Post
                 if (item.ToPublished)
                     publishDate = DateTime.Now;
 
-                await _mediator.Send(new CreatePost(guidId, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, User.Identity.Name, createDate, createDate, publishDate));
+                await _mediator.Send(new CreatePost(guidId, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, User.Identity.Name, createDate, createDate, publishDate, item.PostsRelated.ToList()));
 
                 return guidId.ToString();
             }
