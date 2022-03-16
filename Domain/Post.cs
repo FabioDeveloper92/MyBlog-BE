@@ -109,6 +109,13 @@ namespace Domain
             PostsRelated.Add(postId);
 
             Validate();
+        }   
+        
+        public void SetPostsRelated(List<Guid> postsRelated)
+        {
+            PostsRelated = postsRelated;
+
+            Validate();
         }
         protected override void Validate()
         {

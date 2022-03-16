@@ -16,6 +16,7 @@ namespace Infrastructure.Read.Post
         Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems);
         Task<PostUpdateReadDto> GetPostAllFields(Guid id);
         Task<List<PostMyOverviewReadDto>> GetMyPosts(string userEmail, string title, FilterPostStatus filterStatus, OrderPostDate orderPost, int limit);
+        Task<List<MyPostRelatedSimpleDto>> GetMyPostRelatedSimple(string userEmail);
     }
     public class PostReadRepository : IPostReadRepository
     {
@@ -99,7 +100,8 @@ namespace Infrastructure.Read.Post
                                                      .Include("CreateBy")
                                                      .Include("CreateDate")
                                                      .Include("UpdateDate")
-                                                     .Include("PublishDate");
+                                                     .Include("PublishDate")
+                                                     .Include("PostsRelated");
 
             return await _dbContext.Find(filterId).Project<PostUpdateReadDto>(projection).FirstOrDefaultAsync();
         }
@@ -147,6 +149,23 @@ namespace Infrastructure.Read.Post
                                    .Project<PostMyOverviewReadDto>(projection)
                                    .Sort(sort)
                                    .Limit(limit)
+                                   .ToListAsync();
+        }
+
+        public async Task<List<MyPostRelatedSimpleDto>> GetMyPostRelatedSimple(string userEmail)
+        {
+            var filterPublishDateIsNull = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+            var filteruserEmail = Builders<PostReadMapper>.Filter.Eq("CreateBy", userEmail);
+            var filter = Builders<PostReadMapper>.Filter.And(filteruserEmail, !filterPublishDateIsNull);
+
+            var projection = Builders<PostReadMapper>.Projection
+                                                     .Include("Title");
+
+            var sort = Builders<PostReadMapper>.Sort.Descending("Title");
+
+            return await _dbContext.Find(filter)
+                                   .Project<MyPostRelatedSimpleDto>(projection)
+                                   .Sort(sort)
                                    .ToListAsync();
         }
     }

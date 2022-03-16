@@ -4,6 +4,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Web.Api.Controllers.Blog
@@ -26,7 +27,7 @@ namespace Web.Api.Controllers.Blog
         }
 
         [HttpPut("{id}")]
-        public async Task Put(Guid id, [FromBody] Models.Post.UpdatePost item)
+        public async Task<string> Put(Guid id, [FromBody] Models.Post.NewPost item)
         {
             var updateDate = DateTime.Now;
 
@@ -35,7 +36,11 @@ namespace Web.Api.Controllers.Blog
             if (item.ToPublished)
                 publishDate = DateTime.Now;
 
-            await _mediator.Send(new Application.Post.Commands.UpdatePost(id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, User.Identity.Name, updateDate, publishDate));
+            var postsRelated = item.PostsRelated?.ToList();
+
+            await _mediator.Send(new Application.Post.Commands.UpdatePost(id, item.Title, item.ImageThumb, item.ImageMain, item.Text, item.Tags, User.Identity.Name, updateDate, publishDate, postsRelated));
+
+            return id.ToString();
         }
     }
 }

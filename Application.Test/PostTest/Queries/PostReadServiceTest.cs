@@ -524,6 +524,31 @@ namespace Application.Test.PostTest.Queries
             postRelated.ImageThumb.Should().Be(postRelatedImageThumb);
         }
 
+        [Fact]
+        public async Task get_my_post_can_be_post_related()
+        {
+            var postId = Guid.NewGuid();
+            const string postTitle = "My First Post";
+            const string postText = "This is an example";
+            var postCategories = new int[1] { 0 };
+            const string postImageUrl = "myUrl";
+            const string postImageThumbUrl = "myUrl2";
+            var d = new DateTime(2021, 8, 16);
+            var postCreateDate = DateTime.SpecifyKind(d, DateTimeKind.Utc);
+            var publishDate = DateTime.SpecifyKind(new DateTime(2021, 11, 27), DateTimeKind.Utc);
+            const string postCreateBy = "Admin";
+
+            _sandbox.Scenario.WithPost(postId, postTitle, postText, postCategories, postImageUrl, postImageThumbUrl, postCreateDate, postCreateDate, publishDate, postCreateBy, null)
+                             .WithPost()
+                             .WithPost();
+
+            //ACT
+            var myPostsRelated = await _sandbox.Mediator.Send(new GetMyPostRelatedSimple(postCreateBy));
+
+            var myFirstPostRelated = myPostsRelated.Single(p => p.Id == postId);
+            myFirstPostRelated.Id.Should().Be(postId);
+        }
+
         public void Dispose()
         {
             _sandbox?.Dispose();

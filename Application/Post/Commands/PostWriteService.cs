@@ -44,6 +44,7 @@ namespace Application.Post.Commands
             entity.SetCreateBy(command.CreateBy);
             entity.SetUpdateDate(command.UpdateDate);
             entity.SetPublishDate(command.PublishDate);
+            entity.SetPostsRelated(command.PostsRelated);
 
             await _postWriteRepository.Update(entity);
 

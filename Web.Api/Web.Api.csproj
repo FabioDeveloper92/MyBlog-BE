@@ -27,4 +27,8 @@
     <ProjectReference Include="..\Config\Config.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Application\Post\Commands\" />
+  </ItemGroup>
+
 </Project>

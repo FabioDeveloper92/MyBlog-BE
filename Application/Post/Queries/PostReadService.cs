@@ -11,7 +11,8 @@ namespace Application.Post.Queries
                                    IRequestHandler<GetPosts, List<PostReadDto>>,
                                    IRequestHandler<GetPostsOverview, List<PostOverviewReadDto>>,
                                    IRequestHandler<GetPostUpdate, PostUpdateReadDto>,
-                                   IRequestHandler<GetMyPostOverview, List<PostMyOverviewReadDto>>
+                                   IRequestHandler<GetMyPostOverview, List<PostMyOverviewReadDto>>,
+                                   IRequestHandler<GetMyPostRelatedSimple, List<MyPostRelatedSimpleDto>>
 
     {
         private readonly IPostReadRepository _postReadRepository;
@@ -53,6 +54,11 @@ namespace Application.Post.Queries
         public async Task<List<PostMyOverviewReadDto>> Handle(GetMyPostOverview request, CancellationToken cancellationToken)
         {
             return await _postReadRepository.GetMyPosts(request.UserEmail, request.Title, request.Status, request.OrderBy, request.Limit);
+        }
+
+        public async Task<List<MyPostRelatedSimpleDto>> Handle(GetMyPostRelatedSimple request, CancellationToken cancellationToken)
+        {
+            return await _postReadRepository.GetMyPostRelatedSimple(request.UserMail);
         }
     }
 }

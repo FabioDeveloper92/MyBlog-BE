@@ -1,16 +1,15 @@
 ﻿using Application.Post.Commands;
-using Application.Post.Queries;
-using Infrastructure.Read.Post;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Web.Api.Models.Post;
 
 namespace Web.Api.Controllers.Blog
 {
     [Route("api/[controller]")]
+    [Authorize]
     public class PostCommentController : ControllerBase
     {
         private readonly IMediator _mediator;
