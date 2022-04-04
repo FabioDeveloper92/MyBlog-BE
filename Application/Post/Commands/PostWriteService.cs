@@ -29,7 +29,7 @@ namespace Application.Post.Commands
 
         public async Task<Unit> Handle(UpdatePost command, CancellationToken cancellationToken)
         {
-            var entity = await _postWriteRepository.SingleOrDefault(command.Id);
+           var entity = await _postWriteRepository.SingleOrDefault(command.Id);
 
             if (entity == null)
                 throw new PostNotFoundException();

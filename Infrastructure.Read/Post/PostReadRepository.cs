@@ -1,9 +1,11 @@
 ﻿using Infrastructure.Core;
 using Infrastructure.Core.Enum;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -71,20 +73,25 @@ namespace Infrastructure.Read.Post
 
         public async Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems)
         {
-            var filterPublishDateIsNull = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
+            var sortBson = new BsonDocument()
+            {
+                new BsonElement("_id", 1),
+                new BsonElement("Title", 1),
+                new BsonElement("ImageThumb", 1),
+                new BsonElement("Tags", 1),
+                new BsonElement("CreateBy", 1),
+                new BsonElement("PublishDate", 1),
+                new BsonElement("CommentNumber", new BsonDocument("$size", "$Comments"))
+            };
 
-            var projection = Builders<PostReadMapper>.Projection
-                                                     .Include("Title")
-                                                     .Include("ImageThumb")
-                                                     .Include("Tags")
-                                                     .Include("CreateBy")
-                                                     .Include("PublishDate");
+            var pipeline = new BsonDocument[] {
+                new BsonDocument{ { "$match", new BsonDocument("PublishDate", new BsonDocument() { { "$ne", BsonNull.Value } }) }},
+                new BsonDocument{ { "$project", sortBson } },
+                new BsonDocument{ { "$sort",  new BsonDocument("PublishDate", -1) } },
+                new BsonDocument{ { "$limit", maxItems } }
+            };
 
-            return await _dbContext.Find(!filterPublishDateIsNull)
-                                    .Project<PostOverviewReadDto>(projection)
-                                    .SortByDescending(p => p.PublishDate)
-                                    .Limit(maxItems)
-                                    .ToListAsync();
+            return await _dbContext.Aggregate<PostOverviewReadDto>(pipeline).ToListAsync();
         }
 
         public async Task<PostUpdateReadDto> GetPostAllFields(Guid id)

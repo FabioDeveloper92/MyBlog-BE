@@ -251,7 +251,9 @@ namespace Application.Test.PostTest.Queries
                              .And()
                              .WithPost(postId2, postTitle2, "aaaa", postCategories2, "aaaa", postImageThumbUrl2, postCreateDate2, postCreateDate2, publishDate2, postCreateBy2, null)
                              .And()
-                             .WithPost();
+                             .WithPost()
+                             .And()
+                             .WithPostComment(Guid.NewGuid(), postId1, "fake", "Test", publishDate1);
 
             //ACT
             var posts = await _sandbox.Mediator.Send(new GetPostsOverview(3));
@@ -266,6 +268,7 @@ namespace Application.Test.PostTest.Queries
             firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
             firstPost.CreateBy.Should().Be(postCreateBy1);
             firstPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+            firstPost.CommentNumber.Should().Be(1);
 
             secondPost.Id.Should().Be(postId2);
             secondPost.Title.Should().Be(postTitle2);
@@ -273,6 +276,7 @@ namespace Application.Test.PostTest.Queries
             secondPost.PublishDate.Should().NotBeNull().And.Be(publishDate2);
             secondPost.CreateBy.Should().Be(postCreateBy2);
             secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories2.Length).And.Contain(postCategories2);
+            secondPost.CommentNumber.Should().Be(0);
         }
 
         [Fact]

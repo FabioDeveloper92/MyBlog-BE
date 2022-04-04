@@ -227,7 +227,7 @@ namespace Application.Test.PostTest.Commands
             _sandbox.Scenario.WithPost(postId, "Post", "<b>Hello</b>", new int[] { 1 }, "myUrl", "myFakeUrl", postCreateDate, postCreateDate, null, "alfa", null);
 
             //ACT 
-            await _sandbox.Mediator.Send(new UpdatePost(postId, "a", "a", "a", "b", new int[] { 0 }, "b", DateTime.Now, DateTime.Now));
+            await _sandbox.Mediator.Send(new UpdatePost(postId, "a", "a", "a", "b", new int[] { 0 }, "b", DateTime.Now, DateTime.Now, null));
         }
 
         [Fact]
