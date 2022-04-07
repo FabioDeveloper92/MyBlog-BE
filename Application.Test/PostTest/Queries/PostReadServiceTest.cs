@@ -280,6 +280,36 @@ namespace Application.Test.PostTest.Queries
         }
 
         [Fact]
+        public async Task create_one_post_witout_comment_and_return_post_overview_published()
+        {
+            //ARRANGE
+            var postId1 = Guid.NewGuid();
+            const string postTitle1 = "My First Post";
+            var postCategories1 = new[] { 0 };
+            const string postImageThumbUrl1 = "myFirstUrlPostThumb";
+            var d1 = new DateTime(2020, 7, 11);
+            var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
+            var publishDate1 = DateTime.SpecifyKind(new DateTime(2099, 10, 25), DateTimeKind.Utc);
+            const string postCreateBy1 = "FabioAdmin";
+
+            _sandbox.Scenario.WithPost(postId1, postTitle1, "aaaa", postCategories1, "aaaa", postImageThumbUrl1, postCreateDate1, postCreateDate1, publishDate1, postCreateBy1, null);
+
+            //ACT
+            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(3));
+
+            //ASSERT
+            var firstPost = posts.Single(p => p.Id == postId1);
+
+            firstPost.Id.Should().Be(postId1);
+            firstPost.Title.Should().Be(postTitle1);
+            firstPost.ImageThumb.Should().Be(postImageThumbUrl1);
+            firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
+            firstPost.CreateBy.Should().Be(postCreateBy1);
+            firstPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+            firstPost.CommentNumber.Should().Be(0);
+        }
+
+        [Fact]
         public async Task get_post_update_with_id_return_one_post()
         {
             //ARRANGE

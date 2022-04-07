@@ -73,15 +73,27 @@ namespace Infrastructure.Read.Post
 
         public async Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems)
         {
-            var sortBson = new BsonDocument()
+            var commentProjectCheckIsNull = new BsonDocument
             {
-                new BsonElement("_id", 1),
-                new BsonElement("Title", 1),
-                new BsonElement("ImageThumb", 1),
-                new BsonElement("Tags", 1),
-                new BsonElement("CreateBy", 1),
-                new BsonElement("PublishDate", 1),
-                new BsonElement("CommentNumber", new BsonDocument("$size", "$Comments"))
+                {
+                   "$cond", new BsonArray()
+                   {
+                       new BsonDocument{ { "$gt", new BsonArray() { "$Comments", BsonNull.Value } } },
+                       new BsonDocument{ {"$size", "$Comments" } },
+                       0
+                   }
+                }
+            };
+
+            var sortBson = new BsonDocument
+            {
+                { "_id", 1},
+                {"Title", 1 },
+                {"ImageThumb", 1 },
+                {"Tags", 1 },
+                {"CreateBy", 1 },
+                {"PublishDate", 1 },
+                {"CommentNumber", commentProjectCheckIsNull}
             };
 
             var pipeline = new BsonDocument[] {
