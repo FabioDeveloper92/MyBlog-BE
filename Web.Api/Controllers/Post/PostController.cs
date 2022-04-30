@@ -1,4 +1,5 @@
 ﻿using Application.Post.Queries;
+using Infrastructure.Core.Enum;
 using Infrastructure.Read.Post;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -16,12 +17,6 @@ namespace Web.Api.Controllers.Blog
         public PostController(IMediator mediator)
         {
             _mediator = mediator;
-        }
-
-        [HttpGet]
-        public async Task<List<PostReadDto>> Get()
-        {
-            return await _mediator.Send(new GetPosts());
         }
 
         [HttpGet("{id}")]

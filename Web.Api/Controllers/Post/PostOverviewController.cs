@@ -1,5 +1,6 @@
 ﻿
 using Application.Post.Queries;
+using Infrastructure.Core.Enum;
 using Infrastructure.Read.Post;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +19,10 @@ namespace Web.Api.Controllers.Post
             _mediator = mediator;
         }
 
-        [HttpGet("{limit}")]
-        public async Task<List<PostOverviewReadDto>> Get(int limit)
+        [HttpPost]
+        public async Task<List<PostOverviewReadDto>> Post([FromBody] Models.Post.FilterAllPosts item)
         {
-            return await _mediator.Send(new GetPostsOverview(limit));
+            return await _mediator.Send(new GetPostsOverview(item.Limit, (FilterByTime)item.FilterByTime, (OrderByVisibility)item.OrderByVisibility));
         }
     }
 }

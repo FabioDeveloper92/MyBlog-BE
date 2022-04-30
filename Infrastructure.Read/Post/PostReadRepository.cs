@@ -1,7 +1,6 @@
 ﻿using Infrastructure.Core;
 using Infrastructure.Core.Enum;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -14,8 +13,7 @@ namespace Infrastructure.Read.Post
     public interface IPostReadRepository
     {
         Task<PostPublishedReadDto> GetPostPublished(Guid id);
-        Task<List<PostReadDto>> GetAll();
-        Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems);
+        Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems, FilterByTime filterByTime, OrderByVisibility orderByVisibility);
         Task<PostUpdateReadDto> GetPostAllFields(Guid id);
         Task<List<PostMyOverviewReadDto>> GetMyPosts(string userEmail, string title, FilterPostStatus filterStatus, OrderPostDate orderPost, int limit);
         Task<List<MyPostRelatedSimpleDto>> GetMyPostRelatedSimple(string userEmail);
@@ -54,24 +52,7 @@ namespace Infrastructure.Read.Post
                                     .FirstOrDefaultAsync();
         }
 
-        public async Task<List<PostReadDto>> GetAll()
-        {
-            var filterPublishDateIsNull = Builders<PostReadMapper>.Filter.Eq("PublishDate", BsonNull.Value);
-
-            var projection = Builders<PostReadMapper>.Projection
-                                                     .Include("Title")
-                                                     .Include("Text")
-                                                     .Include("ImageMain")
-                                                     .Include("Tags")
-                                                     .Include("CreateBy")
-                                                     .Include("PublishDate")
-                                                     .Include("Comments")
-                                                     .Include("PostsRelated");
-
-            return await _dbContext.Find(!filterPublishDateIsNull).Project<PostReadDto>(projection).ToListAsync();
-        }
-
-        public async Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems)
+        public async Task<List<PostOverviewReadDto>> GetAllOverview(int maxItems, FilterByTime filterByTime, OrderByVisibility orderByVisibility)
         {
             var commentProjectCheckIsNull = new BsonDocument
             {
@@ -84,8 +65,7 @@ namespace Infrastructure.Read.Post
                    }
                 }
             };
-
-            var sortBson = new BsonDocument
+            var projectBson = new BsonDocument
             {
                 { "_id", 1},
                 {"Title", 1 },
@@ -96,10 +76,77 @@ namespace Infrastructure.Read.Post
                 {"CommentNumber", commentProjectCheckIsNull}
             };
 
+            BsonDocument sortBson;
+            switch (orderByVisibility)
+            {
+                case OrderByVisibility.Top:
+                    {
+                        sortBson = new BsonDocument("PublishDate", -1);
+                        break;
+                    }
+                case OrderByVisibility.Relevant:
+                    {
+                        sortBson = new BsonDocument {
+                            {"CommentNumber", -1},
+                            {"PublishDate", -1 },
+                        };
+                        break;
+                    }
+                case OrderByVisibility.Latest:
+                case OrderByVisibility.Undefined:
+                default:
+                    {
+                        sortBson = new BsonDocument("PublishDate", -1);
+                        break;
+                    }
+            }
+
+            BsonDocument matchBson = null;
+            switch (filterByTime)
+            {
+                case FilterByTime.Week:
+                    {
+                        matchBson = new BsonDocument
+                        {
+                            {
+                               "$and", new BsonArray()
+                                        {
+                                            new BsonDocument("PublishDate", new BsonDocument() { { "$ne", BsonNull.Value } }),
+                                            new BsonDocument("PublishDate", new BsonDocument() { { "$gte", DateTime.SpecifyKind( DateTime.Now.AddDays(-7),DateTimeKind.Utc) } }),
+                                            new BsonDocument("PublishDate", new BsonDocument() { { "$lte", DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc) } })
+                                        }
+                            }
+                        };
+                        break;
+                    }
+                case FilterByTime.Month:
+                    {
+                        matchBson = new BsonDocument
+                        {
+                            {
+                               "$and", new BsonArray()
+                                        {
+                                            new BsonDocument("PublishDate", new BsonDocument() { { "$ne", BsonNull.Value } }),
+                                            new BsonDocument("PublishDate", new BsonDocument() { { "$gte", DateTime.SpecifyKind( DateTime.Now.AddMonths(-1),DateTimeKind.Utc) } }),
+                                            new BsonDocument("PublishDate", new BsonDocument() { { "$lte", DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc) } })
+                                        }
+                            }
+                        };
+                        break;
+                    }
+                case FilterByTime.Infinity:
+                case FilterByTime.Undefined:
+                default:
+                    {
+                        matchBson = new BsonDocument("PublishDate", new BsonDocument() { { "$ne", BsonNull.Value } });
+                        break;
+                    }
+            }
+
             var pipeline = new BsonDocument[] {
-                new BsonDocument{ { "$match", new BsonDocument("PublishDate", new BsonDocument() { { "$ne", BsonNull.Value } }) }},
-                new BsonDocument{ { "$project", sortBson } },
-                new BsonDocument{ { "$sort",  new BsonDocument("PublishDate", -1) } },
+                new BsonDocument{ { "$match", matchBson } },
+                new BsonDocument{ { "$project", projectBson } },
+                new BsonDocument{ { "$sort",  sortBson }},
                 new BsonDocument{ { "$limit", maxItems } }
             };
 

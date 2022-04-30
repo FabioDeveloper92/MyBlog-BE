@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace Application.Post.Queries
 {
     public class PostReadService : IRequestHandler<GetPostPublished, PostPublishedReadDto>,
-                                   IRequestHandler<GetPosts, List<PostReadDto>>,
                                    IRequestHandler<GetPostsOverview, List<PostOverviewReadDto>>,
                                    IRequestHandler<GetPostUpdate, PostUpdateReadDto>,
                                    IRequestHandler<GetMyPostOverview, List<PostMyOverviewReadDto>>,
@@ -32,19 +31,14 @@ namespace Application.Post.Queries
             return post;
         }
 
-        public async Task<List<PostReadDto>> Handle(GetPosts request, CancellationToken cancellationToken)
-        {
-            return await _postReadRepository.GetAll();
-        }
-
         public async Task<List<PostOverviewReadDto>> Handle(GetPostsOverview request, CancellationToken cancellationToken)
         {
-            return await _postReadRepository.GetAllOverview(request.MaxItems);
+            return await _postReadRepository.GetAllOverview(request.MaxItems, request.FilterByTime, request.OrderByVisibility);
         }
 
         public async Task<PostUpdateReadDto> Handle(GetPostUpdate request, CancellationToken cancellationToken)
         {
-            var post= await _postReadRepository.GetPostAllFields(request.Id);
+            var post = await _postReadRepository.GetPostAllFields(request.Id);
             if (post == null)
                 throw new PostNotFoundException();
 

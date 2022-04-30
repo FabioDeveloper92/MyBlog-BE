@@ -146,7 +146,7 @@ namespace Application.Test.PostTest.Queries
                              .WithPost(postId2, postTitle2, postText2, postCategories2, postImageUrl2, postImageThumbUrl2, postCreateDate2, postCreateDate2, publishDate2, postCreateBy2, null);
 
             //ACT
-            var posts = await _sandbox.Mediator.Send(new GetPosts());
+            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(100, FilterByTime.Infinity, OrderByVisibility.Latest));
 
             //ASSERT
             var firstPost = posts.Single(p => p.Id == postId1);
@@ -154,19 +154,17 @@ namespace Application.Test.PostTest.Queries
 
             firstPost.Id.Should().Be(postId1);
             firstPost.Title.Should().Be(postTitle1);
-            firstPost.Text.Should().Be(postText1);
-            firstPost.ImageMain.Should().Be(postImageUrl1);
             firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
             firstPost.CreateBy.Should().Be(postCreateBy1);
             firstPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+            firstPost.CommentNumber.Should().Be(0);
 
             secondPost.Id.Should().Be(postId2);
             secondPost.Title.Should().Be(postTitle2);
-            secondPost.Text.Should().Be(postText2); ;
-            secondPost.ImageMain.Should().Be(postImageUrl2);
             secondPost.PublishDate.Should().NotBeNull().And.Be(publishDate2);
             secondPost.CreateBy.Should().Be(postCreateBy2);
             secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+            secondPost.CommentNumber.Should().Be(0);
         }
 
         [Fact]
@@ -202,7 +200,7 @@ namespace Application.Test.PostTest.Queries
                              .WithPost();
 
             //ACT
-            var posts = await _sandbox.Mediator.Send(new GetPosts());
+            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(100, FilterByTime.Infinity, OrderByVisibility.Latest));
 
             //ASSERT
             var firstPost = posts.Single(p => p.Id == postId1);
@@ -210,19 +208,17 @@ namespace Application.Test.PostTest.Queries
 
             firstPost.Id.Should().Be(postId1);
             firstPost.Title.Should().Be(postTitle1);
-            firstPost.Text.Should().Be(postText1);
-            firstPost.ImageMain.Should().Be(postImageUrl1);
             firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
             firstPost.CreateBy.Should().Be(postCreateBy1);
             firstPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+            firstPost.CommentNumber.Should().Be(0);
 
             secondPost.Id.Should().Be(postId2);
             secondPost.Title.Should().Be(postTitle2);
-            secondPost.Text.Should().Be(postText2); ;
-            secondPost.ImageMain.Should().Be(postImageUrl2);
             secondPost.PublishDate.Should().NotBeNull().And.Be(publishDate2);
             secondPost.CreateBy.Should().Be(postCreateBy2);
             secondPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories2.Length).And.Contain(postCategories2);
+            secondPost.CommentNumber.Should().Be(0);
         }
 
         [Fact]
@@ -256,7 +252,7 @@ namespace Application.Test.PostTest.Queries
                              .WithPostComment(Guid.NewGuid(), postId1, "fake", "Test", publishDate1);
 
             //ACT
-            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(3));
+            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(3, FilterByTime.Undefined, OrderByVisibility.Undefined));
 
             //ASSERT
             var firstPost = posts.Single(p => p.Id == postId1);
@@ -289,13 +285,13 @@ namespace Application.Test.PostTest.Queries
             const string postImageThumbUrl1 = "myFirstUrlPostThumb";
             var d1 = new DateTime(2020, 7, 11);
             var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
-            var publishDate1 = DateTime.SpecifyKind(new DateTime(2099, 10, 25), DateTimeKind.Utc);
+            var publishDate1 = DateTime.SpecifyKind(new DateTime(2099, 12, 31), DateTimeKind.Utc);
             const string postCreateBy1 = "FabioAdmin";
 
             _sandbox.Scenario.WithPost(postId1, postTitle1, "aaaa", postCategories1, "aaaa", postImageThumbUrl1, postCreateDate1, postCreateDate1, publishDate1, postCreateBy1, null);
 
             //ACT
-            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(3));
+            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(3, FilterByTime.Undefined, OrderByVisibility.Undefined));
 
             //ASSERT
             var firstPost = posts.Single(p => p.Id == postId1);
@@ -582,6 +578,57 @@ namespace Application.Test.PostTest.Queries
             var myFirstPostRelated = myPostsRelated.Single(p => p.Id == postId);
             myFirstPostRelated.Id.Should().Be(postId);
         }
+
+        [Fact]
+        public async Task create_two_post_published_return_one_is_published_in_the_week()
+        {
+            //ARRANGE
+            var postId1 = Guid.NewGuid();
+            const string postTitle1 = "SQL Example";
+            const string postText1 = "a b c d";
+            var postCategories1 = new[] { 0 };
+            const string postImageUrl1 = "url:code";
+            const string postImageThumbUrl1 = "thumb//ecc";
+            var d1 = new DateTime(2020, 8, 11);
+            var postCreateDate1 = DateTime.SpecifyKind(d1, DateTimeKind.Utc);
+            var dateYesterday = DateTime.Now.AddDays(-1);
+            var publishDate1 = DateTime.SpecifyKind(new DateTime(dateYesterday.Year, dateYesterday.Month, dateYesterday.Day), DateTimeKind.Utc);
+            const string postCreateBy1 = "FabioAdmin2";
+
+            var postId2 = Guid.NewGuid();
+            const string postTitle2 = "SQL Rel example";
+            const string postText2 = "fake fake";
+            var postCategories2 = new[] { 0, 1 };
+            const string postImageUrl2 = "what";
+            const string postImageThumbUrl2 = "when";
+            var d2 = new DateTime(2021, 8, 21);
+            var postCreateDate2 = DateTime.SpecifyKind(d2, DateTimeKind.Utc);
+            var publishDate2 = DateTime.SpecifyKind(DateTime.Now.AddDays(-10), DateTimeKind.Utc);
+            const string postCreateBy2 = "FabioR";
+
+            _sandbox.Scenario.WithPost(postId1, postTitle1, postText1, postCategories1, postImageUrl1, postImageThumbUrl1, postCreateDate1, postCreateDate1, publishDate1, postCreateBy1, null)
+                             .And()
+                             .WithPost(postId2, postTitle2, postText2, postCategories2, postImageUrl2, postImageThumbUrl2, postCreateDate2, postCreateDate2, publishDate2, postCreateBy2, null)
+                             .And()
+                             .WithPost();
+
+            //ACT
+            var posts = await _sandbox.Mediator.Send(new GetPostsOverview(100, FilterByTime.Week, OrderByVisibility.Latest));
+
+            //ASSERT
+            var firstPost = posts.Single(p => p.Id == postId1);
+            var secondPost = posts.SingleOrDefault(p => p.Id == postId2);
+
+            firstPost.Id.Should().Be(postId1);
+            firstPost.Title.Should().Be(postTitle1);
+            firstPost.PublishDate.Should().NotBeNull().And.Be(publishDate1);
+            firstPost.CreateBy.Should().Be(postCreateBy1);
+            firstPost.Tags.Should().NotBeEmpty().And.HaveCount(postCategories1.Length).And.Contain(postCategories1);
+            firstPost.CommentNumber.Should().Be(0);
+
+            secondPost.Should().BeNull();
+        }
+
 
         public void Dispose()
         {
